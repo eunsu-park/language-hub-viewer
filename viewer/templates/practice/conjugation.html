@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% from "macros/icons.html" import icon %}
+
+{% block title %}{% if lang == 'ko' %}활용 훈련{% else %}Conjugation Drill{% endif %} - {{ course_display }} - Language Viewer{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/practice.css') }}">
+{% endblock %}
+
+{% block header %}
+<nav class="breadcrumb">
+    <a href="{{ url_for('index', lang=lang) }}">{% if lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+    <span class="separator">/</span>
+    <a href="{{ url_for('course_home', lang=lang, course_name=course) }}">{{ course_display }}</a>
+    <span class="separator">/</span>
+    <a href="{{ url_for('practice_hub', lang=lang, course_name=course) }}">{% if lang == 'ko' %}연습{% else %}Practice{% endif %}</a>
+    <span class="separator">/</span>
+    <span class="current">{% if lang == 'ko' %}활용 훈련{% else %}Conjugation Drill{% endif %}</span>
+</nav>
+<h1>{{ icon('exercise', 24) }} {% if lang == 'ko' %}활용 훈련{% else %}Conjugation Drill{% endif %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="drill-page">
+    <!-- Filter Bar -->
+    <div class="drill-filters">
+        <div class="drill-filters__row">
+            <div class="drill-filters__field">
+                <label for="verb-filter" class="drill-filters__label">
+                    {% if lang == 'ko' %}동사{% else %}Verb{% endif %}
+                </label>
+                <select id="verb-filter" class="drill-select">
+                    <option value="all">{% if lang == 'ko' %}모든 동사{% else %}All Verbs{% endif %}</option>
+                    {% for verb in verbs %}
+                    <option value="{{ verb.infinitive }}">{{ verb.infinitive }} ({{ verb.meaning|i18n(lang) }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="drill-filters__field">
+                <label for="tense-filter" class="drill-filters__label">
+                    {% if lang == 'ko' %}시제{% else %}Tense{% endif %}
+                </label>
+                <select id="tense-filter" class="drill-select">
+                    <option value="all">{% if lang == 'ko' %}모든 시제{% else %}All Tenses{% endif %}</option>
+                    {% for tense in tenses %}
+                    <option value="{{ tense.id }}">{{ tense.label|i18n(lang) }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button class="btn btn-primary drill-start-btn" id="start-drill-btn" type="button">
+                {% if lang == 'ko' %}시작{% else %}Start{% endif %}
+            </button>
+        </div>
+    </div>
+
+    <!-- Score Display -->
+    <div class="drill-score" id="drill-score" style="display: none;">
+        <div class="drill-score__streak">
+            <span class="drill-score__streak-icon" id="streak-icon">&#128293;</span>
+            <span class="drill-score__streak-count" id="streak-count">0</span>
+        </div>
+        <div class="drill-score__total">
+            <span class="drill-score__correct" id="correct-count">0</span>
+            /
+            <span class="drill-score__total-count" id="total-count">0</span>
+            <span class="drill-score__label">{% if lang == 'ko' %}정답{% else %}correct{% endif %}</span>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="drill-loading" id="drill-loading" style="display: none;">
+        <div class="drill-loading__spinner"></div>
+        <p>{% if lang == 'ko' %}문제를 불러오는 중...{% else %}Loading questions...{% endif %}</p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="drill-empty" id="drill-empty" style="display: none;">
+        <p>{% if lang == 'ko' %}선택한 필터에 맞는 문제가 없습니다.{% else %}No questions match the selected filters.{% endif %}</p>
+    </div>
+
+    <!-- Drill Card -->
+    <div class="drill-card" id="drill-card" style="display: none;">
+        <div class="drill-card__prompt">
+            <div class="drill-card__verb">
+                <span class="drill-card__infinitive" id="drill-infinitive"></span>
+                <span class="drill-card__meaning" id="drill-meaning"></span>
+            </div>
+            <div class="drill-card__context">
+                <span class="drill-card__tense" id="drill-tense"></span>
+                <span class="drill-card__separator">&middot;</span>
+                <span class="drill-card__person" id="drill-person"></span>
+            </div>
+        </div>
+
+        <div class="drill-input-group">
+            <input type="text"
+                   id="drill-answer"
+                   class="drill-input"
+                   placeholder="{% if lang == 'ko' %}활용형을 입력하세요...{% else %}Type the conjugation...{% endif %}"
+                   autocomplete="off"
+                   autocapitalize="off"
+                   spellcheck="false">
+            <div class="accent-helpers" id="accent-helpers">
+                <button class="accent-btn" data-char="a" type="button">a</button>
+                <button class="accent-btn" data-char="e" type="button">e</button>
+                <button class="accent-btn" data-char="i" type="button">i</button>
+                <button class="accent-btn" data-char="o" type="button">o</button>
+                <button class="accent-btn" data-char="u" type="button">u</button>
+                <button class="accent-btn" data-char="n" type="button">n</button>
+                <button class="accent-btn" data-char="u-diaeresis" type="button">&uuml;</button>
+            </div>
+        </div>
+
+        <button class="btn btn-primary drill-btn" id="drill-submit-btn" type="button">
+            {% if lang == 'ko' %}확인{% else %}Check{% endif %}
+        </button>
+    </div>
+
+    <!-- Feedback -->
+    <div class="drill-feedback" id="drill-feedback" style="display: none;">
+        <div class="drill-feedback__content" id="drill-feedback-content">
+            <span class="drill-feedback__icon" id="feedback-icon"></span>
+            <span class="drill-feedback__text" id="feedback-text"></span>
+        </div>
+        <div class="drill-feedback__expected" id="feedback-expected" style="display: none;">
+            <span class="drill-feedback__expected-label">{% if lang == 'ko' %}정답:{% else %}Expected:{% endif %}</span>
+            <span class="drill-feedback__expected-value" id="expected-value"></span>
+        </div>
+        <button class="btn btn-primary drill-btn" id="drill-next-btn" type="button">
+            {% if lang == 'ko' %}다음{% else %}Next{% endif %}
+        </button>
+    </div>
+
+    <!-- Session Complete -->
+    <div class="drill-complete" id="drill-complete" style="display: none;">
+        <div class="drill-complete__card">
+            <h2>{% if lang == 'ko' %}훈련 완료!{% else %}Drill Complete!{% endif %}</h2>
+            <div class="drill-complete__stats">
+                <div class="drill-complete__stat">
+                    <span class="drill-complete__value" id="summary-correct">0</span>
+                    <span class="drill-complete__label">{% if lang == 'ko' %}정답{% else %}Correct{% endif %}</span>
+                </div>
+                <div class="drill-complete__stat">
+                    <span class="drill-complete__value" id="summary-total">0</span>
+                    <span class="drill-complete__label">{% if lang == 'ko' %}전체{% else %}Total{% endif %}</span>
+                </div>
+                <div class="drill-complete__stat">
+                    <span class="drill-complete__value" id="summary-accuracy">0%</span>
+                    <span class="drill-complete__label">{% if lang == 'ko' %}정답률{% else %}Accuracy{% endif %}</span>
+                </div>
+                <div class="drill-complete__stat">
+                    <span class="drill-complete__value" id="summary-streak">0</span>
+                    <span class="drill-complete__label">{% if lang == 'ko' %}최대 연속{% else %}Best Streak{% endif %}</span>
+                </div>
+            </div>
+            <div class="drill-complete__actions">
+                <button class="btn btn-primary" id="drill-restart-btn" type="button">
+                    {% if lang == 'ko' %}다시 시작{% else %}Start Again{% endif %}
+                </button>
+                <a href="{{ url_for('practice_hub', lang=lang, course_name=course) }}" class="btn">
+                    {% if lang == 'ko' %}연습 목록{% else %}Practice Hub{% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pass config to JS -->
+<script>
+window.DRILL_CONFIG = {
+    course: '{{ course }}',
+    lang: '{{ lang }}',
+    verbs: {{ verbs|tojson }},
+    tenses: {{ tenses|tojson }}
+};
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/practice.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,128 @@
+{% from "macros/icons.html" import icon %}
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        (function(){
+            var t = localStorage.getItem('theme');
+            if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+    <title>{% block title %}Language Viewer{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/highlight.css') }}">
+    <!-- KaTeX for LaTeX math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false}
+            ],
+            throwOnError: false
+        });"></script>
+    {% if auth_enabled %}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    {% endif %}
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('index', lang=lang) }}" class="logo">Language Viewer</a>
+                <button class="sidebar-collapse-btn" id="sidebar-collapse" aria-label="Collapse sidebar" title="Collapse sidebar">
+                    &laquo;
+                </button>
+                <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">
+                    <span></span>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('index', lang=lang) }}" class="nav-item {% if request.endpoint == 'index' %}active{% endif %}">
+                    <span class="nav-icon">{{ icon('home', 18) }}</span>
+                    <span class="nav-text">Home</span>
+                </a>
+                <a href="{{ url_for('dashboard', lang=lang) }}" class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                    <span class="nav-icon">{{ icon('dashboard', 18) }}</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="{{ url_for('bookmarks', lang=lang) }}" class="nav-item {% if request.endpoint == 'bookmarks' %}active{% endif %}">
+                    <span class="nav-icon">{{ icon('bookmark', 18) }}</span>
+                    <span class="nav-text">Bookmarks</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-search">
+                <form action="{{ url_for('search_page', lang=lang) }}" method="get">
+                    <label for="sidebar-search-input" class="sr-only">Search</label>
+                    <input type="search" id="sidebar-search-input" name="q" placeholder="{% if lang == 'ko' %}검색 (2글자 이상){% else %}Search (min 2 chars){% endif %}" value="{{ request.args.get('q', '') }}" aria-label="{% if lang == 'ko' %}레슨 검색{% else %}Search lessons{% endif %}">
+                </form>
+            </div>
+
+            <!-- Language Selector -->
+            <div class="sidebar-lang">
+                <select id="lang-select" class="lang-selector" onchange="switchLanguage(this.value)">
+                    {% for language in languages %}
+                    <option value="{{ language.code }}" {% if language.code == lang %}selected{% endif %}>
+                        {{ language.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="sidebar-footer">
+                {% if auth_enabled %}
+                {% if current_user.is_authenticated %}
+                <div class="sidebar-user">
+                    <span class="user-name">{{ current_user.display_name or current_user.username }}</span>
+                    <form action="{{ url_for('auth.logout') }}" method="POST" class="logout-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn-logout" title="Logout">Logout</button>
+                    </form>
+                </div>
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn-login">Login</a>
+                {% endif %}
+                {% endif %}
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                    <span class="theme-icon light">{{ icon('sun', 18) }}</span>
+                    <span class="theme-icon dark">{{ icon('moon', 18) }}</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <button class="menu-toggle" id="menu-toggle" aria-label="Open menu">
+                    <span></span>
+                </button>
+                {% block header %}{% endblock %}
+            </header>
+
+            <div class="content">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/tts.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        function switchLanguage(newLang) {
+            const currentPath = window.location.pathname;
+            const currentLang = '{{ lang }}';
+            const newPath = currentPath.replace('/' + currentLang + '/', '/' + newLang + '/');
+            window.location.href = newPath + window.location.search;
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}{% if lang == 'ko' %}검색{% else %}Search{% endif %} - Language Viewer{% endblock %}
+
+{% block header %}
+<h1>{% if lang == 'ko' %}검색{% else %}Search{% endif %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="search-page">
+    <form action="{{ url_for('search_page', lang=lang) }}" method="get" class="search-form">
+        <input type="search" name="q" value="{{ query }}" placeholder="{% if lang == 'ko' %}검색어 입력{% else %}Enter search term{% endif %}" autofocus>
+        <button type="submit" class="btn">{% if lang == 'ko' %}검색{% else %}Search{% endif %}</button>
+    </form>
+
+    {% if query %}
+    <p class="search-meta">{{ results|length }} {% if lang == 'ko' %}결과{% else %}results{% endif %} for "{{ query }}"</p>
+    {% endif %}
+
+    {% if results %}
+    <div class="search-results">
+        {% for result in results %}
+        <a href="{{ url_for('lesson', lang=lang, course_name=result.topic, filename=result.filename) }}" class="search-result">
+            <div class="result-header">
+                <span class="result-topic">{{ result.topic }}</span>
+                <span class="result-title">{{ result.title }}</span>
+            </div>
+            {% if result.snippet %}
+            <p class="result-snippet">{{ result.snippet|safe }}</p>
+            {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+    {% elif query %}
+    <p class="search-empty">{% if lang == 'ko' %}결과가 없습니다.{% else %}No results found.{% endif %}</p>
+    {% endif %}
+</div>
+{% endblock %}

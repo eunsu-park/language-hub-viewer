@@ -1,0 +1,742 @@
+/* ===========================================
+   Practice / Conjugation Drill - Styles
+   Matches the dark/light theme system via
+   data-theme attribute and CSS variables
+   from style.css.
+   =========================================== */
+
+/* Page Layout */
+.drill-page {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: var(--spacing-md) 0;
+}
+
+/* ===========================================
+   Practice Hub
+   =========================================== */
+
+.practice-hub__desc {
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.practice-hub__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+}
+
+.practice-hub__card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.practice-hub__card:hover {
+    border-color: var(--accent-color);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    color: var(--text-primary);
+}
+
+.practice-hub__card-icon {
+    flex-shrink: 0;
+    color: var(--accent-color);
+    margin-top: 2px;
+}
+
+.practice-hub__card-info {
+    flex: 1;
+}
+
+.practice-hub__card-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin: 0 0 var(--spacing-xs);
+}
+
+.practice-hub__card-desc {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ===========================================
+   Drill Filters
+   =========================================== */
+
+.drill-filters {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.drill-filters__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--spacing-md);
+}
+
+.drill-filters__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    flex: 1;
+    min-width: 160px;
+}
+
+.drill-filters__label {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.drill-select {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    font-family: inherit;
+    cursor: pointer;
+    width: 100%;
+}
+
+.drill-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.drill-start-btn {
+    flex-shrink: 0;
+    align-self: flex-end;
+}
+
+/* ===========================================
+   Score Display
+   =========================================== */
+
+.drill-score {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-sm);
+}
+
+.drill-score__streak {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.drill-score__streak-icon {
+    font-size: 1.25rem;
+    opacity: 0.4;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.drill-score__streak-icon.active {
+    opacity: 1;
+    animation: drill-fire-pulse 0.6s ease infinite alternate;
+}
+
+@keyframes drill-fire-pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.15); }
+}
+
+.drill-score__streak-count {
+    font-weight: 700;
+    font-size: var(--font-size-lg);
+    color: var(--text-primary);
+}
+
+.drill-score__total {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: var(--text-secondary);
+}
+
+.drill-score__correct {
+    font-weight: 700;
+    color: var(--success-color);
+}
+
+.drill-score__total-count {
+    font-weight: 500;
+}
+
+.drill-score__label {
+    color: var(--text-muted);
+}
+
+/* ===========================================
+   Loading State
+   =========================================== */
+
+.drill-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl) 0;
+    color: var(--text-secondary);
+    gap: var(--spacing-md);
+}
+
+.drill-loading__spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--accent-color);
+    border-radius: 50%;
+    animation: drill-spin 0.8s linear infinite;
+}
+
+@keyframes drill-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.drill-empty {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--text-secondary);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+/* ===========================================
+   Drill Card
+   =========================================== */
+
+.drill-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+}
+
+.drill-card__prompt {
+    margin-bottom: var(--spacing-lg);
+}
+
+.drill-card__verb {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: var(--spacing-md);
+}
+
+.drill-card__infinitive {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.drill-card__meaning {
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
+}
+
+.drill-card__context {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+.drill-card__tense {
+    font-weight: 500;
+    color: var(--accent-color);
+}
+
+.drill-card__separator {
+    color: var(--text-muted);
+}
+
+.drill-card__person {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: var(--font-size-lg);
+}
+
+/* ===========================================
+   Drill Input
+   =========================================== */
+
+.drill-input-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.drill-input {
+    width: 100%;
+    padding: var(--spacing-md);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: var(--font-size-xl);
+    font-family: inherit;
+    text-align: center;
+    transition: border-color var(--transition-fast);
+}
+
+.drill-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.drill-input::placeholder {
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+}
+
+/* Accent Helpers */
+.accent-helpers {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+}
+
+.accent-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.accent-btn:hover {
+    border-color: var(--accent-color);
+    background: var(--bg-secondary);
+    color: var(--accent-color);
+}
+
+.accent-btn:active {
+    transform: scale(0.95);
+}
+
+/* ===========================================
+   Drill Feedback
+   =========================================== */
+
+.drill-feedback {
+    text-align: center;
+    margin-top: var(--spacing-md);
+}
+
+.drill-feedback__content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+}
+
+.drill-feedback__content--correct {
+    background: rgba(25, 135, 84, 0.12);
+    color: var(--success-color);
+    border: 1px solid rgba(25, 135, 84, 0.3);
+}
+
+.drill-feedback__content--incorrect {
+    background: rgba(220, 53, 69, 0.12);
+    color: var(--danger-color);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+[data-theme="dark"] .drill-feedback__content--correct {
+    background: rgba(45, 211, 111, 0.15);
+    color: #6ee7a0;
+    border-color: rgba(45, 211, 111, 0.3);
+}
+
+[data-theme="dark"] .drill-feedback__content--incorrect {
+    background: rgba(252, 129, 129, 0.15);
+    color: #fca5a5;
+    border-color: rgba(252, 129, 129, 0.3);
+}
+
+.drill-feedback__icon {
+    font-size: 1.25rem;
+}
+
+.drill-feedback__expected {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-sm);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-sm);
+}
+
+.drill-feedback__expected-label {
+    color: var(--text-secondary);
+    margin-right: var(--spacing-xs);
+}
+
+.drill-feedback__expected-value {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: var(--font-size-lg);
+}
+
+/* ===========================================
+   Drill Button
+   =========================================== */
+
+.drill-btn {
+    min-width: 120px;
+}
+
+/* ===========================================
+   Drill Complete
+   =========================================== */
+
+.drill-complete {
+    max-width: 500px;
+    margin: var(--spacing-xl) auto;
+}
+
+.drill-complete__card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-xl);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+}
+
+.drill-complete__card h2 {
+    margin-bottom: var(--spacing-lg);
+    color: var(--text-primary);
+}
+
+.drill-complete__stats {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.drill-complete__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.drill-complete__value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.drill-complete__label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.drill-complete__actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-md);
+}
+
+/* ===========================================
+   Quiz — Multiple Choice
+   =========================================== */
+
+.quiz-choices {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.quiz-choice {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+    text-align: left;
+}
+
+.quiz-choice:hover:not(:disabled) {
+    border-color: var(--accent-color);
+    background: var(--bg-primary);
+    transform: translateY(-1px);
+}
+
+.quiz-choice:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.quiz-choice__number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    flex-shrink: 0;
+    color: var(--text-secondary);
+}
+
+.quiz-choice__text {
+    flex: 1;
+}
+
+.quiz-choice--selected {
+    border-color: var(--accent-color);
+    background: var(--bg-primary);
+}
+
+.quiz-choice--selected .quiz-choice__number {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+}
+
+.quiz-choice--correct {
+    border-color: var(--success-color);
+    background: rgba(25, 135, 84, 0.08);
+}
+
+.quiz-choice--correct .quiz-choice__number {
+    background: var(--success-color);
+    border-color: var(--success-color);
+    color: #fff;
+}
+
+[data-theme="dark"] .quiz-choice--correct {
+    border-color: #6ee7a0;
+    background: rgba(45, 211, 111, 0.1);
+}
+
+[data-theme="dark"] .quiz-choice--correct .quiz-choice__number {
+    background: #6ee7a0;
+    border-color: #6ee7a0;
+    color: #1a1a2e;
+}
+
+.quiz-choice--incorrect {
+    border-color: var(--danger-color);
+    background: rgba(220, 53, 69, 0.08);
+}
+
+.quiz-choice--incorrect .quiz-choice__number {
+    background: var(--danger-color);
+    border-color: var(--danger-color);
+    color: #fff;
+}
+
+[data-theme="dark"] .quiz-choice--incorrect {
+    border-color: #fca5a5;
+    background: rgba(252, 129, 129, 0.1);
+}
+
+[data-theme="dark"] .quiz-choice--incorrect .quiz-choice__number {
+    background: #fca5a5;
+    border-color: #fca5a5;
+    color: #1a1a2e;
+}
+
+.quiz-choice:disabled {
+    cursor: default;
+    opacity: 0.85;
+}
+
+/* ===========================================
+   Quiz — Prompt Styling
+   =========================================== */
+
+.quiz-prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.quiz-prompt__label {
+    display: block;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.quiz-prompt__word {
+    display: block;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.quiz-prompt__meaning {
+    display: block;
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
+}
+
+.quiz-prompt__context {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin-top: var(--spacing-xs);
+}
+
+.quiz-prompt__tense {
+    font-weight: 500;
+    color: var(--accent-color);
+}
+
+.quiz-prompt__person {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: var(--font-size-lg);
+}
+
+/* ===========================================
+   Quiz — Hint
+   =========================================== */
+
+.quiz-hint {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin-top: var(--spacing-xs);
+    font-style: italic;
+}
+
+/* ===========================================
+   Responsive
+   =========================================== */
+
+@media (max-width: 768px) {
+    .practice-hub__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .drill-filters__row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .drill-filters__field {
+        min-width: unset;
+    }
+
+    .drill-start-btn {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+@media (max-width: 600px) {
+    .quiz-choices {
+        grid-template-columns: 1fr;
+    }
+
+    .quiz-prompt__word {
+        font-size: 1.5rem;
+    }
+
+    .drill-card {
+        padding: var(--spacing-lg);
+    }
+
+    .drill-card__infinitive {
+        font-size: 1.5rem;
+    }
+
+    .drill-input {
+        font-size: var(--font-size-lg);
+        padding: var(--spacing-sm);
+    }
+
+    .accent-btn {
+        width: 32px;
+        height: 32px;
+        font-size: var(--font-size-sm);
+    }
+
+    .drill-complete__stats {
+        flex-wrap: wrap;
+        gap: var(--spacing-md);
+    }
+
+    .drill-complete__stat {
+        min-width: 80px;
+    }
+
+    .drill-complete__actions {
+        flex-direction: column;
+    }
+
+    .drill-complete__actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .drill-score {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        text-align: center;
+    }
+}

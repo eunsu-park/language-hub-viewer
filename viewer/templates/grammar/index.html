@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% from "macros/icons.html" import icon %}
+
+{% block title %}{% if lang == 'ko' %}문법{% else %}Grammar{% endif %} - {{ course_display }} - Language Viewer{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/grammar.css') }}">
+{% endblock %}
+
+{% block header %}
+<nav class="breadcrumb">
+    <a href="{{ url_for('index', lang=lang) }}">{% if lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+    <span class="separator">/</span>
+    <a href="{{ url_for('course_home', lang=lang, course_name=course) }}">{{ course_display }}</a>
+    <span class="separator">/</span>
+    <span class="current">{% if lang == 'ko' %}문법{% else %}Grammar{% endif %}</span>
+</nav>
+<h1>{{ icon('grammar', 24) }} {{ course_display }} {% if lang == 'ko' %}문법 참고{% else %}Grammar Reference{% endif %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="grammar-page">
+    <!-- Verb Conjugations -->
+    <section class="grammar-section">
+        <h2 class="grammar-section__title">
+            {% if lang == 'ko' %}동사 활용{% else %}Verb Conjugations{% endif %}
+        </h2>
+        <p class="grammar-section__desc">
+            {% if lang == 'ko' %}동사를 클릭하면 전체 활용표를 볼 수 있습니다.{% else %}Click a verb to see its full conjugation tables.{% endif %}
+        </p>
+
+        {% if verbs %}
+        <div class="verb-grid">
+            {% for verb in verbs %}
+            <a href="{{ url_for('grammar_verb', lang=lang, course_name=course, verb=verb.infinitive) }}"
+               class="verb-card">
+                <div class="verb-card__header">
+                    <span class="verb-card__infinitive">{{ verb.infinitive }}</span>
+                    <span class="verb-card__meaning">{{ verb.meaning|i18n(lang) }}</span>
+                </div>
+                <div class="verb-card__badges">
+                    <span class="type-badge type-badge--{{ verb.type }}">
+                        {% if verb.type == 'regular' %}
+                            {% if lang == 'ko' %}규칙{% else %}Regular{% endif %}
+                        {% elif verb.type == 'irregular' %}
+                            {% if lang == 'ko' %}불규칙{% else %}Irregular{% endif %}
+                        {% elif verb.type == 'stem_change' %}
+                            {% if lang == 'ko' %}어간변화{% else %}Stem-change{% endif %}
+                        {% else %}
+                            {{ verb.type }}
+                        {% endif %}
+                    </span>
+                    <span class="group-badge group-badge--{{ verb.group|lower }}">{{ verb.group }}</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="grammar-empty">
+            <p>{% if lang == 'ko' %}등록된 동사가 없습니다.{% else %}No verbs available yet.{% endif %}</p>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- Grammar Rules -->
+    <section class="grammar-section">
+        <h2 class="grammar-section__title">
+            {% if lang == 'ko' %}문법 규칙{% else %}Grammar Rules{% endif %}
+        </h2>
+        <p class="grammar-section__desc">
+            {% if lang == 'ko' %}주요 문법 규칙과 용법을 확인하세요.{% else %}Review key grammar rules and usage patterns.{% endif %}
+        </p>
+
+        {% if rules %}
+        <div class="rule-list">
+            {% for rule in rules %}
+            <a href="{{ url_for('grammar_rule', lang=lang, course_name=course, rule_id=rule.id) }}"
+               class="rule-card">
+                <div class="rule-card__header">
+                    <span class="rule-card__label">{{ rule.label|i18n(lang) }}</span>
+                    {% if rule.cefr %}
+                    <span class="cefr-badge cefr-badge--{{ rule.cefr|lower }}">{{ rule.cefr }}</span>
+                    {% endif %}
+                </div>
+                {% if rule.category %}
+                <span class="rule-card__category">{{ rule.category }}</span>
+                {% endif %}
+                {% if rule.description %}
+                <p class="rule-card__desc">{{ rule.description|i18n(lang) }}</p>
+                {% endif %}
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="grammar-empty">
+            <p>{% if lang == 'ko' %}등록된 문법 규칙이 없습니다.{% else %}No grammar rules available yet.{% endif %}</p>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- Tense Reference -->
+    <section class="grammar-section">
+        <h2 class="grammar-section__title">
+            {% if lang == 'ko' %}시제 참고{% else %}Tense Reference{% endif %}
+        </h2>
+        <p class="grammar-section__desc">
+            {% if lang == 'ko' %}사용 가능한 시제 목록입니다.{% else %}Available tenses for conjugation reference.{% endif %}
+        </p>
+
+        {% if tenses %}
+        <div class="tense-list">
+            {% for tense in tenses %}
+            <div class="tense-item">
+                <span class="tense-item__label">{{ tense.label|i18n(lang) }}</span>
+                <span class="tense-item__id">{{ tense.id }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="grammar-empty">
+            <p>{% if lang == 'ko' %}등록된 시제가 없습니다.{% else %}No tenses available yet.{% endif %}</p>
+        </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

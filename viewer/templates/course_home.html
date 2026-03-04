@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course_display }} - Language Viewer{% endblock %}
+
+{% block header %}
+<nav class="breadcrumb">
+    <a href="{{ url_for('index', lang=lang) }}">{% if lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+    <span class="separator">/</span>
+    <span class="current">{{ course_display }}</span>
+</nav>
+<h1>{{ course_display }}</h1>
+<div class="header-meta">
+    {% if not auth_enabled or current_user.is_authenticated %}
+    <span class="progress-badge">{{ overall.percentage }}% {% if lang == 'ko' %}완료{% else %}complete{% endif %}</span>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+{% if not auth_enabled or current_user.is_authenticated %}
+<div class="topic-progress-header">
+    <div class="progress-bar large">
+        <div class="progress-fill" style="width: {{ overall.percentage }}%"></div>
+    </div>
+    <span class="progress-text">{{ overall.read }} / {{ overall.total }} {% if lang == 'ko' %}레슨 완료{% else %}lessons completed{% endif %}</span>
+</div>
+
+{% if continue_lesson %}
+<div class="continue-banner">
+    <a href="{{ url_for('lesson', lang=lang, course_name=course, filename=continue_lesson.filename) }}" class="continue-link">
+        {% if lang == 'ko' %}이어서 학습: {% else %}Continue: {% endif %}
+        <strong>{{ continue_lesson.title or continue_lesson.display_name }}</strong>
+    </a>
+</div>
+{% endif %}
+{% endif %}
+
+<!-- Quick Actions -->
+<div class="course-actions">
+    <a href="{{ url_for('vocabulary_index', lang=lang, course_name=course) }}" class="course-action-card">
+        {{ icon('vocab', 24) }}
+        <span>{% if lang == 'ko' %}어휘 목록{% else %}Vocabulary{% endif %}</span>
+    </a>
+    <a href="{{ url_for('flashcard_page', lang=lang, course_name=course) }}" class="course-action-card">
+        {{ icon('flashcard', 24) }}
+        <span>{% if lang == 'ko' %}플래시카드{% else %}Flashcards{% endif %}</span>
+    </a>
+    <a href="{{ url_for('grammar_index', lang=lang, course_name=course) }}" class="course-action-card">
+        {{ icon('grammar', 24) }}
+        <span>{% if lang == 'ko' %}문법{% else %}Grammar{% endif %}</span>
+    </a>
+    <a href="{{ url_for('practice_hub', lang=lang, course_name=course) }}" class="course-action-card">
+        {{ icon('practice', 24) }}
+        <span>{% if lang == 'ko' %}연습{% else %}Practice{% endif %}</span>
+    </a>
+</div>
+
+<!-- Stage groups -->
+{% for stage in staged_lessons %}
+<section class="stage-group" style="--stage-color: {{ stage.color }}">
+    <div class="stage-header">
+        <h2 class="stage-title">
+            <span class="cefr-badge" style="background: {{ stage.color }}; color: white;">{{ stage.cefr }}</span>
+            {{ stage.label.get(lang, stage.id) }}
+        </h2>
+        {% if stage.description.get(lang) %}
+        <p class="stage-description">{{ stage.description[lang] }}</p>
+        {% endif %}
+        {% if not auth_enabled or current_user.is_authenticated %}
+        <div class="stage-progress">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ stage.progress.percentage }}%; background: {{ stage.color }}"></div>
+            </div>
+            <span class="progress-text">{{ stage.progress.read }}/{{ stage.progress.total }}</span>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="lessons-list">
+        {% for lesson in stage.lessons %}
+        <a href="{{ url_for('lesson', lang=lang, course_name=course, filename=lesson.filename) }}"
+           class="lesson-item {% if lesson.is_read %}read{% endif %}"
+           data-read="{{ 'true' if lesson.is_read else 'false' }}"
+           data-bookmarked="{{ 'true' if lesson.is_bookmarked else 'false' }}">
+            <div class="lesson-status">
+                {% if lesson.is_read %}
+                <span class="status-icon read" title="Read">&#10003;</span>
+                {% else %}
+                <span class="status-icon unread" title="Unread">&#9675;</span>
+                {% endif %}
+            </div>
+            <div class="lesson-info">
+                <h3 class="lesson-title">{{ lesson.title or lesson.display_name }}</h3>
+                <div class="lesson-meta">
+                    <span class="lesson-filename">{{ lesson.filename }}</span>
+                    <span class="lesson-duration">~{{ lesson.reading_time }} {% if lang == 'ko' %}분{% else %}min{% endif %}</span>
+                </div>
+            </div>
+            <div class="lesson-actions">
+                {% if lesson.is_bookmarked %}
+                <span class="bookmark-icon active" title="Bookmarked">&#128278;</span>
+                {% endif %}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Bookmarks - Language Viewer{% endblock %}
+
+{% block header %}
+<h1>{% if lang == 'ko' %}북마크{% else %}Bookmarks{% endif %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="bookmarks-page">
+    {% if bookmarks %}
+    <div class="bookmarks-list">
+        {% for item in bookmarks %}
+        <div class="bookmark-item" data-lang="{{ lang }}" data-topic="{{ item.course }}" data-filename="{{ item.filename }}">
+            <a href="{{ url_for('lesson', lang=lang, course_name=item.course, filename=item.filename) }}" class="bookmark-link">
+                <div class="bookmark-info">
+                    <span class="bookmark-course">{{ item.course }}</span>
+                    <span class="bookmark-title">{{ item.title }}</span>
+                </div>
+                <span class="bookmark-time">{{ item.created_at|timeago }}</span>
+            </a>
+            <button class="bookmark-remove" data-action="remove-bookmark" title="{% if lang == 'ko' %}삭제{% else %}Remove{% endif %}">&#10005;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="bookmarks-empty">{% if lang == 'ko' %}북마크가 없습니다.{% else %}No bookmarks yet.{% endif %}</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/bookmarks.js') }}"></script>
+{% endblock %}

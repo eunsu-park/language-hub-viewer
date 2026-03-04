@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Language Viewer - Home{% endblock %}
+
+{% block header %}
+<h1>{% if lang == 'ko' %}언어 학습{% else %}Language Learning{% endif %}</h1>
+<p class="header-subtitle">{% if lang == 'ko' %}코스를 선택하세요{% else %}Choose a course{% endif %}</p>
+{% endblock %}
+
+{% block content %}
+<div class="home">
+    <section class="home-section">
+        <h2>{% if lang == 'ko' %}코스{% else %}Courses{% endif %} ({{ courses|length }})</h2>
+        <div class="topics-grid">
+            {% for course in courses %}
+            <a href="{{ url_for('course_home', lang=lang, course_name=course.name) }}" class="topic-card">
+                <div class="topic-card-header">
+                    <h4 class="topic-name">{{ course.display_name }}</h4>
+                    <span class="lesson-count">{{ course.total_lessons }} {% if lang == 'ko' %}레슨{% else %}lessons{% endif %}</span>
+                </div>
+                <div class="topic-card-meta">
+                    <span class="cefr-badge">CEFR {{ course.cefr_range }}</span>
+                    {% if course.label.get(lang) %}
+                    <span class="course-label">{{ course.label[lang] }}</span>
+                    {% endif %}
+                </div>
+                {% if not auth_enabled or current_user.is_authenticated %}
+                <div class="topic-card-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ course.progress.percentage }}%"></div>
+                    </div>
+                    <span class="progress-text">{{ course.progress.read }}/{{ course.progress.total }} {% if lang == 'ko' %}완료{% else %}completed{% endif %}</span>
+                </div>
+                {% endif %}
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

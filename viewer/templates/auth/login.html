@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Language Viewer{% endblock %}
+
+{% block header %}
+<h1>Login</h1>
+{% endblock %}
+
+{% block content %}
+<div class="login-page">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="flash flash-{{ category }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <form method="POST" class="login-form">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            <label for="username">Username</label>
+            {{ form.username(class="form-input", id="username", autofocus=true) }}
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            {{ form.password(class="form-input", id="password") }}
+        </div>
+        <div class="form-group checkbox">
+            {{ form.remember(id="remember") }}
+            <label for="remember">Remember me</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+</div>
+{% endblock %}

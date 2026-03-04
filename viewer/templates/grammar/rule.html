@@ -1,0 +1,489 @@
+{% extends "base.html" %}
+{% from "macros/icons.html" import icon %}
+
+{% block title %}{{ rule.label|i18n(lang) }} - {% if lang == 'ko' %}문법{% else %}Grammar{% endif %} - {{ course_display }} - Language Viewer{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/grammar.css') }}">
+{% endblock %}
+
+{% block header %}
+<nav class="breadcrumb">
+    <a href="{{ url_for('index', lang=lang) }}">{% if lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+    <span class="separator">/</span>
+    <a href="{{ url_for('course_home', lang=lang, course_name=course) }}">{{ course_display }}</a>
+    <span class="separator">/</span>
+    <a href="{{ url_for('grammar_index', lang=lang, course_name=course) }}">{% if lang == 'ko' %}문법{% else %}Grammar{% endif %}</a>
+    <span class="separator">/</span>
+    <span class="current">{{ rule.label|i18n(lang) }}</span>
+</nav>
+<h1>{{ rule.label|i18n(lang) }}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="grammar-page">
+    <!-- Rule Header -->
+    <div class="rule-header">
+        <div class="rule-header__meta">
+            {% if rule.cefr %}
+            <span class="cefr-badge cefr-badge--{{ rule.cefr|lower }}">{{ rule.cefr }}</span>
+            {% endif %}
+            {% if rule.category %}
+            <span class="rule-header__category">{{ rule.category }}</span>
+            {% endif %}
+        </div>
+        {% if rule.description %}
+        <p class="rule-header__desc">{{ rule.description|i18n(lang) }}</p>
+        {% endif %}
+    </div>
+
+    {# ── Mnemonics (ser_vs_estar: DOCTOR/PLACE) ── #}
+    {% if rule.mnemonics %}
+    <section class="rule-section">
+        <h2 class="rule-section__title">
+            {% if lang == 'ko' %}기억법{% else %}Mnemonics{% endif %}
+        </h2>
+        <div class="mnemonic-list">
+            {% for mnemonic in rule.mnemonics %}
+            <div class="mnemonic-item">
+                {% if mnemonic.name %}
+                <span class="mnemonic-item__acronym">{{ mnemonic.name }}{% if mnemonic['for'] %} ({{ mnemonic['for'] }}){% endif %}</span>
+                {% endif %}
+                {% if mnemonic.description %}
+                <p class="mnemonic-item__desc">{{ mnemonic.description|i18n(lang) }}</p>
+                {% endif %}
+                {% if mnemonic['items'] is defined and mnemonic['items'] %}
+                <div class="mnemonic-item__words">
+                    {% for item in mnemonic['items'] %}
+                    <span class="mnemonic-word" title="{{ item.example if item.example else '' }}">
+                        <strong>{{ item.letter }}</strong> {{ item.meaning|i18n(lang) }}
+                    </span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {# ── Adjective Contrasts (ser_vs_estar) ── #}
+    {% if rule.contrasts and rule.contrasts is sequence and rule.contrasts[0] is mapping and rule.contrasts[0].adjective is defined %}
+    <section class="rule-section">
+        <h2 class="rule-section__title">
+            {% if lang == 'ko' %}형용사 대조{% else %}Adjective Contrasts{% endif %}
+        </h2>
+        <div class="contrast-table-wrap">
+            <table class="contrast-table">
+                <thead>
+                    <tr>
+                        <th>{% if lang == 'ko' %}형용사{% else %}Adjective{% endif %}</th>
+                        <th>SER</th>
+                        <th>ESTAR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in rule.contrasts %}
+                    <tr>
+                        <td><strong>{{ c.adjective }}</strong></td>
+                        <td>{{ c.ser|i18n(lang) }}<br><em>{{ c.ser.example if c.ser is mapping and c.ser.example is defined else '' }}</em></td>
+                        <td>{{ c.estar|i18n(lang) }}<br><em>{{ c.estar.example if c.estar is mapping and c.estar.example is defined else '' }}</em></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    {% endif %}
+
+    {# ── Side-by-side Comparison (preterite_vs_imperfect) ── #}
+    {% if rule.comparison %}
+    <section class="rule-section">
+        <h2 class="rule-section__title">
+            {% if lang == 'ko' %}비교{% else %}Comparison{% endif %}
+        </h2>
+        <div class="contrast-table-wrap">
+            <table class="contrast-table">
+                <thead>
+                    <tr>
+                        {% for key, data in rule.comparison.items() %}
+                        <th>{{ data.label|i18n(lang) if data.label is defined else key|title }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set comp_items = rule.comparison.values()|list %}
+                    {% set max_len = comp_items|map(attribute='characteristics')|map('length')|max %}
+                    {% for i in range(max_len) %}
+                    <tr>
+                        {% for key, data in rule.comparison.items() %}
+                        <td>
+                            {% if data.characteristics is defined and i < data.characteristics|length %}
+                            {{ data.characteristics[i]|i18n(lang) }}
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    {% endif %}
+
+    {# ── Trigger Words (multiple rules) ── #}
+    {% if rule.trigger_words %}
+    <section class="rule-section">
+        <h2 class="rule-section__title">
+            {% if lang == 'ko' %}트리거 단어{% else %}Trigger Words{% endif %}
+        </h2>
+        {% if rule.trigger_words is mapping %}
+            {% for group_key, words in rule.trigger_words.items() %}
+            <div class="trigger-group">
+                <h3 class="trigger-group__label">{{ group_key|title }}</h3>
+                <div class="trigger-list">
+                    {% for word in words %}
+                    <span class="trigger-word">{{ word }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        {% elif rule.trigger_words is sequence %}
+            <div class="trigger-list">
+                {% for word in rule.trigger_words %}
+                <span class="trigger-word">{{ word }}</span>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </section>
+    {% endif %}
+
+    {# ── Verbs that Change Meaning (preterite_vs_imperfect) ── #}
+    {% if rule.verbs_that_change_meaning %}
+    <section class="rule-section">
+        <h2 class="rule-section__title">
+            {% if lang == 'ko' %}의미가 바뀌는 동사{% else %}Verbs that Change Meaning{% endif %}
+        </h2>
+        <div class="contrast-table-wrap">
+            <table class="contrast-table">
+                <thead>
+                    <tr>
+                        <th>{% if lang == 'ko' %}동사{% else %}Verb{% endif %}</th>
+                        <th>{% if lang == 'ko' %}과거형{% else %}Preterite{% endif %}</th>
+                        <th>{% if lang == 'ko' %}불완료형{% else %}Imperfect{% endif %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in rule.verbs_that_change_meaning %}
+                    <tr>
+                        <td><strong>{{ v.verb }}</strong></td>
+                        <td>{{ v.preterite|i18n(lang) }}<br><em>{{ v.preterite.example if v.preterite is mapping and v.preterite.example is defined else '' }}</em></td>
+                        <td>{{ v.imperfect|i18n(lang) }}<br><em>{{ v.imperfect.example if v.imperfect is mapping and v.imperfect.example is defined else '' }}</em></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    {% endif %}
+
+    {# ── Narrative Pattern ── #}
+    {% if rule.narrative_pattern %}
+    <section class="rule-section">
+        <h2 class="rule-section__title">
+            {% if lang == 'ko' %}내러티브 패턴{% else %}Narrative Pattern{% endif %}
+        </h2>
+        <div class="example-item">
+            <p class="example-item__sentence">{{ rule.narrative_pattern|i18n(lang) }}</p>
+        </div>
+    </section>
+    {% endif %}
+
+    {# ── WEIRDO Categories (subjunctive_triggers) ── #}
+    {% if rule.weirdo_categories %}
+    <section class="rule-section">
+        <h2 class="rule-section__title">WEIRDO</h2>
+        <div class="mnemonic-list">
+            {% for cat in rule.weirdo_categories %}
+            <div class="mnemonic-item">
+                <span class="mnemonic-item__acronym">{{ cat.letter }} — {{ cat.category|i18n(lang) }}</span>
+                {% if cat.verbs %}
+                <div class="trigger-list">
+                    {% for v in cat.verbs %}
+                    <span class="trigger-word">{{ v }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if cat.expressions %}
+                <div class="trigger-list">
+                    {% for expr in cat.expressions %}
+                    <span class="trigger-word">{{ expr }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if cat.examples %}
+                <div class="example-list" style="margin-top: var(--spacing-sm);">
+                    {% for ex in cat.examples %}
+                    <div class="example-item">
+                        <p class="example-item__sentence">{{ ex }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if cat.exception %}
+                <p class="example-item__note" style="margin-top: var(--spacing-sm);">{{ cat.exception|i18n(lang) }}</p>
+                {% endif %}
+                {% if cat.notes %}
+                <p class="example-item__note" style="margin-top: var(--spacing-sm);">{{ cat.notes|i18n(lang) }}</p>
+                {% endif %}
+                {% if cat.contrast %}
+                <p class="example-item__note" style="margin-top: var(--spacing-sm);">{{ cat.contrast|i18n(lang) }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {# ── Subjunctive Conjunctions ── #}
+    {% if rule.subjunctive_conjunctions %}
+    <section class="rule-section">
+        <h2 class="rule-section__title">
+            {% if lang == 'ko' %}접속법 접속사{% else %}Subjunctive Conjunctions{% endif %}
+        </h2>
+        {% for group_key, group in rule.subjunctive_conjunctions.items() %}
+        <h3 class="trigger-group__label">{{ group.label|i18n(lang) }}</h3>
+        <div class="example-list">
+            {% for conj in group.conjunctions %}
+            <div class="example-item">
+                <p class="example-item__sentence"><strong>{{ conj.conjunction }}</strong> — {{ conj.meaning|i18n(lang) }}</p>
+                {% if conj.example %}
+                <p class="example-item__translation">{{ conj.example }}</p>
+                {% endif %}
+                {% if conj.indicative %}
+                <p class="example-item__translation">{% if lang == 'ko' %}직설법{% else %}Indicative{% endif %}: {{ conj.indicative }}</p>
+                {% endif %}
+                {% if conj.subjunctive %}
+                <p class="example-item__translation">{% if lang == 'ko' %}접속법{% else %}Subjunctive{% endif %}: {{ conj.subjunctive }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    {# ── Si-Clause Types (si_clauses) ── #}
+    {% if rule.types and rule.types is sequence and rule.types[0] is mapping and rule.types[0].formula is defined %}
+    <section class="rule-section">
+        <h2 class="rule-section__title">
+            {% if lang == 'ko' %}Si절 유형{% else %}Si-Clause Types{% endif %}
+        </h2>
+        <div class="si-clause-chart">
+            {% for clause_type in rule.types %}
+            <div class="si-clause-row">
+                <div class="si-clause-row__type">
+                    <span class="si-clause-type-label">{% if lang == 'ko' %}유형{% else %}Type{% endif %} {{ clause_type.type }}</span>
+                    {% if clause_type.name %}
+                    <span class="si-clause-type-name">{{ clause_type.name|i18n(lang) }}</span>
+                    {% endif %}
+                    {% if clause_type.cefr %}
+                    <span class="cefr-badge cefr-badge--{{ clause_type.cefr|lower }}">{{ clause_type.cefr }}</span>
+                    {% endif %}
+                </div>
+                {% if clause_type.formula %}
+                <p style="font-family: var(--font-mono); font-size: var(--font-size-sm); margin: var(--spacing-xs) 0;">{{ clause_type.formula }}</p>
+                {% endif %}
+                {% if clause_type.description %}
+                <p class="example-item__note">{{ clause_type.description|i18n(lang) }}</p>
+                {% endif %}
+                {% if clause_type.examples %}
+                <div class="example-list" style="margin-top: var(--spacing-sm);">
+                    {% for ex in clause_type.examples %}
+                    <div class="example-item">
+                        <p class="example-item__sentence">{{ ex.si_clause }} {{ ex.result }}</p>
+                        {% if ex.translation %}
+                        <p class="example-item__translation">{{ ex.translation|i18n(lang) }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {# ── Important Rule ── #}
+    {% if rule.important_rule %}
+    <section class="rule-section">
+        <h2 class="rule-section__title">
+            {% if lang == 'ko' %}중요 규칙{% else %}Important Rule{% endif %}
+        </h2>
+        <div class="example-item" style="border-left-color: #ef4444;">
+            <p class="example-item__sentence">{{ rule.important_rule|i18n(lang) }}</p>
+        </div>
+    </section>
+    {% endif %}
+
+    {# ── POR / PARA Uses ── #}
+    {% if rule.por_uses or rule.para_uses %}
+    <section class="rule-section">
+        {% if rule.por_uses %}
+        <h2 class="rule-section__title">{{ rule.por_uses.label|i18n(lang) }}</h2>
+        <div class="example-list">
+            {% for item in rule.por_uses.rules %}
+            <div class="example-item">
+                <p class="example-item__sentence">{{ item.rule|i18n(lang) }}</p>
+                {% if item.example %}
+                <p class="example-item__translation">{{ item.example }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% if rule.por_uses.fixed_expressions %}
+        <h3 class="trigger-group__label" style="margin-top: var(--spacing-md);">{% if lang == 'ko' %}고정 표현{% else %}Fixed Expressions{% endif %}</h3>
+        <div class="trigger-list">
+            {% for expr in rule.por_uses.fixed_expressions %}
+            <span class="trigger-word">{{ expr }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endif %}
+
+        {% if rule.para_uses %}
+        <h2 class="rule-section__title" style="margin-top: var(--spacing-xl);">{{ rule.para_uses.label|i18n(lang) }}</h2>
+        <div class="example-list">
+            {% for item in rule.para_uses.rules %}
+            <div class="example-item">
+                <p class="example-item__sentence">{{ item.rule|i18n(lang) }}</p>
+                {% if item.example %}
+                <p class="example-item__translation">{{ item.example }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </section>
+    {% endif %}
+
+    {# ── Contrast Examples (por_vs_para) ── #}
+    {% if rule.contrast_examples %}
+    <section class="rule-section">
+        <h2 class="rule-section__title">
+            {% if lang == 'ko' %}대조 예문{% else %}Contrast Examples{% endif %}
+        </h2>
+        <div class="example-list">
+            {% for ex in rule.contrast_examples %}
+            <div class="example-item">
+                <p class="example-item__note"><strong>{{ ex.context|i18n(lang) }}</strong></p>
+                <p class="example-item__sentence">POR: {{ ex.por }}</p>
+                <p class="example-item__sentence">PARA: {{ ex.para }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {# ── Passive Voice Constructions ── #}
+    {% if rule.ser_passive or rule.se_passive %}
+    <section class="rule-section">
+        {% if rule.ser_passive %}
+        <h2 class="rule-section__title">{{ rule.ser_passive.label|i18n(lang) }}</h2>
+        {% if rule.ser_passive.formation %}
+        <p class="example-item__note" style="margin-bottom: var(--spacing-md);">{{ rule.ser_passive.formation|i18n(lang) }}</p>
+        {% endif %}
+        {% if rule.ser_passive.examples %}
+        <div class="example-list">
+            {% for ex in rule.ser_passive.examples %}
+            <div class="example-item">
+                <p class="example-item__sentence">{{ ex.passive }}</p>
+                {% if ex.translation %}
+                <p class="example-item__translation">{{ ex.translation|i18n(lang) }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if rule.ser_passive.notes %}
+        <p class="example-item__note" style="margin-top: var(--spacing-sm);">{{ rule.ser_passive.notes|i18n(lang) }}</p>
+        {% endif %}
+        {% endif %}
+
+        {% if rule.se_passive %}
+        <h2 class="rule-section__title" style="margin-top: var(--spacing-xl);">{{ rule.se_passive.label|i18n(lang) }}</h2>
+        {% if rule.se_passive.formation %}
+        <p class="example-item__note" style="margin-bottom: var(--spacing-md);">{{ rule.se_passive.formation|i18n(lang) }}</p>
+        {% endif %}
+        {% if rule.se_passive.types %}
+        {% for t in rule.se_passive.types %}
+        <div class="mnemonic-item" style="margin-bottom: var(--spacing-md);">
+            <h3 class="trigger-group__label">{{ t.type|i18n(lang) }}</h3>
+            <p class="example-item__note">{{ t.formation }}</p>
+            {% if t.examples %}
+            <div class="example-list" style="margin-top: var(--spacing-sm);">
+                {% for ex in t.examples %}
+                <div class="example-item">
+                    <p class="example-item__sentence">{{ ex }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% if rule.se_passive.notes %}
+        <p class="example-item__note" style="margin-top: var(--spacing-sm);">{{ rule.se_passive.notes|i18n(lang) }}</p>
+        {% endif %}
+        {% endif %}
+    </section>
+    {% endif %}
+
+    {# ── Stem Changes ── #}
+    {% if rule.boot_pattern %}
+    <section class="rule-section">
+        <h2 class="rule-section__title">
+            {% if lang == 'ko' %}부트 패턴{% else %}Boot Pattern{% endif %}
+        </h2>
+        <pre style="font-family: var(--font-mono); font-size: var(--font-size-sm); background: var(--bg-secondary); padding: var(--spacing-md); border-radius: var(--border-radius); overflow-x: auto; white-space: pre;">{{ rule.boot_pattern|i18n(lang) }}</pre>
+    </section>
+    {% endif %}
+
+    {% if rule.types and rule.types is sequence and rule.types[0] is mapping and rule.types[0].change is defined %}
+    <section class="rule-section">
+        <h2 class="rule-section__title">
+            {% if lang == 'ko' %}변화 유형{% else %}Change Types{% endif %}
+        </h2>
+        {% for change_type in rule.types %}
+        <div class="mnemonic-item" style="margin-bottom: var(--spacing-md);">
+            <span class="mnemonic-item__acronym">{{ change_type.change }}</span>
+            <p class="mnemonic-item__desc">{{ change_type.description|i18n(lang) }}</p>
+            {% if change_type.common_verbs %}
+            <div class="trigger-list" style="margin-top: var(--spacing-sm);">
+                {% for v in change_type.common_verbs %}
+                <span class="trigger-word">{{ v.verb }} ({{ v.meaning|i18n(lang) }})</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% if change_type.note %}
+            <p class="example-item__note" style="margin-top: var(--spacing-sm);">{{ change_type.note|i18n(lang) }}</p>
+            {% endif %}
+            {% if change_type.ir_verb_note %}
+            <p class="example-item__note" style="margin-top: var(--spacing-sm);">{{ change_type.ir_verb_note|i18n(lang) }}</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    {% if rule.summary_table %}
+    <section class="rule-section">
+        <h2 class="rule-section__title">
+            {% if lang == 'ko' %}요약{% else %}Summary{% endif %}
+        </h2>
+        <pre style="font-family: var(--font-mono); font-size: var(--font-size-sm); background: var(--bg-secondary); padding: var(--spacing-md); border-radius: var(--border-radius); overflow-x: auto; white-space: pre;">{{ rule.summary_table|i18n(lang) }}</pre>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

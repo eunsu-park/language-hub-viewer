@@ -1,0 +1,500 @@
+{% extends "base.html" %}
+
+{% block title %}{% if lang == 'ko' %}대시보드{% else %}Dashboard{% endif %} - Language Viewer{% endblock %}
+
+{% block head %}
+<style>
+/* Dashboard: Quick Stats Bar */
+.dashboard-quick-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.dashboard-quick-stat {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.dashboard-quick-stat__icon {
+    font-size: 1.5rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.dashboard-quick-stat__body {
+    min-width: 0;
+}
+
+.dashboard-quick-stat__value {
+    display: block;
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.dashboard-quick-stat__label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+/* Dashboard: CEFR Stage Cards */
+.dashboard-cefr-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.dashboard-cefr-card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--spacing-md);
+    align-items: center;
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    transition: border-color var(--transition-fast);
+}
+
+.dashboard-cefr-card:hover {
+    border-color: var(--text-muted);
+}
+
+.dashboard-cefr-card__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--border-radius);
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+    color: white;
+    flex-shrink: 0;
+}
+
+.dashboard-cefr-card__info {
+    min-width: 0;
+}
+
+.dashboard-cefr-card__label {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.dashboard-cefr-card__progress {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.dashboard-cefr-card__progress .progress-bar {
+    flex: 1;
+}
+
+.dashboard-cefr-card__progress .progress-fill {
+    transition: width 0.6s ease-out;
+}
+
+.dashboard-cefr-card__text {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.dashboard-cefr-card__pct {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--text-primary);
+    min-width: 48px;
+    text-align: right;
+}
+
+/* Dashboard: Vocabulary Stats */
+.dashboard-vocab-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.dashboard-vocab-card {
+    text-align: center;
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.dashboard-vocab-card__value {
+    display: block;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.dashboard-vocab-card__label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.dashboard-vocab-card--due .dashboard-vocab-card__value {
+    color: var(--warning-color);
+}
+
+.dashboard-vocab-card--mastered .dashboard-vocab-card__value {
+    color: var(--success-color);
+}
+
+.dashboard-vocab-bar {
+    margin-top: var(--spacing-sm);
+}
+
+.dashboard-vocab-bar__label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+/* Dashboard: Quiz Stats */
+.dashboard-quiz-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.dashboard-quiz-card {
+    text-align: center;
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.dashboard-quiz-card__value {
+    display: block;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.dashboard-quiz-card__label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.dashboard-quiz-types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.dashboard-quiz-type-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    background: var(--bg-tertiary);
+    border-radius: 999px;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.dashboard-quiz-type-tag__name {
+    font-weight: 500;
+    color: var(--text-primary);
+    text-transform: capitalize;
+}
+
+/* Dashboard: Empty State */
+.dashboard-empty {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--text-secondary);
+}
+
+.dashboard-empty__icon {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-quick-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-cefr-card {
+        grid-template-columns: auto 1fr;
+    }
+
+    .dashboard-cefr-card__pct {
+        display: none;
+    }
+
+    .dashboard-vocab-grid,
+    .dashboard-quiz-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-quick-stats {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block header %}
+<h1>{% if lang == 'ko' %}대시보드{% else %}Dashboard{% endif %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+
+    {# ===== Section 1: Quick Stats Bar ===== #}
+    <section class="home-section">
+        <div class="dashboard-quick-stats">
+            <div class="dashboard-quick-stat">
+                <span class="dashboard-quick-stat__icon" aria-hidden="true">&#128293;</span>
+                <div class="dashboard-quick-stat__body">
+                    <span class="dashboard-quick-stat__value">{{ streak.current_streak }}</span>
+                    <span class="dashboard-quick-stat__label">
+                        {% if lang == 'ko' %}일 연속 학습{% else %}day streak{% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="dashboard-quick-stat">
+                <span class="dashboard-quick-stat__icon" aria-hidden="true">&#128218;</span>
+                <div class="dashboard-quick-stat__body">
+                    <span class="dashboard-quick-stat__value">{{ vocab_stats.total }}/{{ total_words }}</span>
+                    <span class="dashboard-quick-stat__label">
+                        {% if lang == 'ko' %}학습한 단어{% else %}words learned{% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="dashboard-quick-stat">
+                <span class="dashboard-quick-stat__icon" aria-hidden="true">&#9989;</span>
+                <div class="dashboard-quick-stat__body">
+                    <span class="dashboard-quick-stat__value">{{ overall.read }}/{{ overall.total }}</span>
+                    <span class="dashboard-quick-stat__label">
+                        {% if lang == 'ko' %}완료한 레슨{% else %}lessons completed{% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="dashboard-quick-stat">
+                <span class="dashboard-quick-stat__icon" aria-hidden="true">&#127942;</span>
+                <div class="dashboard-quick-stat__body">
+                    <span class="dashboard-quick-stat__value">{{ quiz_stats.avg_score }}%</span>
+                    <span class="dashboard-quick-stat__label">
+                        {% if lang == 'ko' %}퀴즈 평균{% else %}quiz average{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# ===== Section 2: CEFR Stage Progress ===== #}
+    <section class="home-section">
+        <h2>{% if lang == 'ko' %}CEFR 단계별 진행률{% else %}CEFR Stage Progress{% endif %}</h2>
+        {% if stages %}
+        <div class="dashboard-cefr-list">
+            {% for stage in stages %}
+            {% set sp = cefr_progress.get(stage.id, {}) %}
+            {% set cefr_code = stage.cefr.split('-')[0] %}
+            {# CEFR color mapping #}
+            {% if cefr_code == 'A1' %}{% set badge_color = '#4CAF50' %}
+            {% elif cefr_code == 'A2' %}{% set badge_color = '#8BC34A' %}
+            {% elif cefr_code == 'B1' %}{% set badge_color = '#FFC107' %}
+            {% elif cefr_code == 'B2' %}{% set badge_color = '#FF9800' %}
+            {% elif cefr_code == 'C1' %}{% set badge_color = '#F44336' %}
+            {% else %}{% set badge_color = '#6c757d' %}
+            {% endif %}
+            <div class="dashboard-cefr-card" data-stage="{{ stage.id }}">
+                <div class="dashboard-cefr-card__badge" style="background: {{ badge_color }};">
+                    {{ stage.cefr }}
+                </div>
+                <div class="dashboard-cefr-card__info">
+                    <div class="dashboard-cefr-card__label">
+                        {{ stage.label|i18n(lang) if stage.label else stage.id }}
+                    </div>
+                    <div class="dashboard-cefr-card__progress">
+                        <div class="progress-bar large">
+                            <div class="progress-fill{% if sp.percentage == 100 %} complete{% endif %}"
+                                 data-target-width="{{ sp.percentage }}"
+                                 style="width: 0%;"></div>
+                        </div>
+                        <span class="dashboard-cefr-card__text">
+                            {{ sp.lessons_read|default(0) }}/{{ sp.lessons_total|default(0) }}
+                            {% if lang == 'ko' %}레슨{% else %}lessons{% endif %}
+                        </span>
+                    </div>
+                </div>
+                <div class="dashboard-cefr-card__pct">{{ sp.percentage|default(0) }}%</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="dashboard-empty">
+            <div class="dashboard-empty__icon">&#128203;</div>
+            <p>{% if lang == 'ko' %}코스 데이터를 불러올 수 없습니다.{% else %}No course data available.{% endif %}</p>
+        </div>
+        {% endif %}
+    </section>
+
+    {# ===== Section 3: Vocabulary Stats ===== #}
+    <section class="home-section">
+        <h2>{% if lang == 'ko' %}어휘 학습 현황{% else %}Vocabulary Progress{% endif %}</h2>
+        {% if vocab_stats.total > 0 %}
+        <div class="dashboard-vocab-grid">
+            <div class="dashboard-vocab-card">
+                <span class="dashboard-vocab-card__value">{{ vocab_stats.learning }}</span>
+                <span class="dashboard-vocab-card__label">
+                    {% if lang == 'ko' %}학습 중{% else %}Learning{% endif %}
+                </span>
+            </div>
+            <div class="dashboard-vocab-card dashboard-vocab-card--mastered">
+                <span class="dashboard-vocab-card__value">{{ vocab_stats.mastered }}</span>
+                <span class="dashboard-vocab-card__label">
+                    {% if lang == 'ko' %}마스터{% else %}Mastered{% endif %}
+                </span>
+            </div>
+            <div class="dashboard-vocab-card dashboard-vocab-card--due">
+                <span class="dashboard-vocab-card__value">{{ vocab_stats.due_today }}</span>
+                <span class="dashboard-vocab-card__label">
+                    {% if lang == 'ko' %}오늘 복습 필요{% else %}Due Today{% endif %}
+                </span>
+            </div>
+        </div>
+        <div class="dashboard-vocab-bar">
+            <div class="dashboard-vocab-bar__label">
+                {% if lang == 'ko' %}마스터 진행률{% else %}Mastery Progress{% endif %}:
+                {{ vocab_stats.mastered }}/{{ total_words }}
+                {% if lang == 'ko' %}단어{% else %}words{% endif %}
+            </div>
+            <div class="progress-bar large">
+                <div class="progress-fill{% if total_words > 0 and vocab_stats.mastered >= total_words %} complete{% endif %}"
+                     data-target-width="{{ ((vocab_stats.mastered / total_words * 100) if total_words > 0 else 0)|round|int }}"
+                     style="width: 0%;"></div>
+            </div>
+        </div>
+        {% else %}
+        <div class="dashboard-empty">
+            <div class="dashboard-empty__icon">&#128214;</div>
+            <p>{% if lang == 'ko' %}아직 학습한 어휘가 없습니다. 플래시카드를 시작하세요!{% else %}No vocabulary studied yet. Start your flashcard session!{% endif %}</p>
+        </div>
+        {% endif %}
+    </section>
+
+    {# ===== Section 4: Quiz Stats ===== #}
+    <section class="home-section">
+        <h2>{% if lang == 'ko' %}퀴즈 성적{% else %}Quiz Performance{% endif %}</h2>
+        {% if quiz_stats.attempts > 0 %}
+        <div class="dashboard-quiz-grid">
+            <div class="dashboard-quiz-card">
+                <span class="dashboard-quiz-card__value">{{ quiz_stats.attempts }}</span>
+                <span class="dashboard-quiz-card__label">
+                    {% if lang == 'ko' %}시도 횟수{% else %}Attempts{% endif %}
+                </span>
+            </div>
+            <div class="dashboard-quiz-card">
+                <span class="dashboard-quiz-card__value">{{ quiz_stats.avg_score }}%</span>
+                <span class="dashboard-quiz-card__label">
+                    {% if lang == 'ko' %}평균 점수{% else %}Average Score{% endif %}
+                </span>
+            </div>
+            <div class="dashboard-quiz-card">
+                <span class="dashboard-quiz-card__value">{{ quiz_stats.best_score }}%</span>
+                <span class="dashboard-quiz-card__label">
+                    {% if lang == 'ko' %}최고 점수{% else %}Best Score{% endif %}
+                </span>
+            </div>
+        </div>
+        {% if quiz_stats.by_type %}
+        <h3 style="margin-bottom: var(--spacing-sm); font-size: var(--font-size-base);">
+            {% if lang == 'ko' %}유형별 성적{% else %}By Quiz Type{% endif %}
+        </h3>
+        <div class="dashboard-quiz-types">
+            {% for type_name, type_stats in quiz_stats.by_type.items() %}
+            <span class="dashboard-quiz-type-tag">
+                <span class="dashboard-quiz-type-tag__name">{{ type_name.replace('_', ' ') }}</span>
+                {{ type_stats.attempts }}x &middot; {{ type_stats.avg }}%
+            </span>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="dashboard-empty">
+            <div class="dashboard-empty__icon">&#128221;</div>
+            <p>{% if lang == 'ko' %}아직 퀴즈를 풀지 않았습니다. 연습을 시작해 보세요!{% else %}No quiz attempts yet. Try a practice quiz!{% endif %}</p>
+        </div>
+        {% endif %}
+    </section>
+
+    {# ===== Section 5: Course Progress ===== #}
+    <section class="home-section">
+        <h2>{% if lang == 'ko' %}코스별 진행률{% else %}Course Progress{% endif %}</h2>
+        <div class="overall-stats" style="margin-bottom: var(--spacing-lg);">
+            <div class="stat-card highlight">
+                <span class="stat-value">{{ overall.percentage }}%</span>
+                <span class="stat-label">{% if lang == 'ko' %}전체 완료{% else %}Overall{% endif %}</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">{{ overall.read }}/{{ overall.total }}</span>
+                <span class="stat-label">{% if lang == 'ko' %}레슨{% else %}Lessons{% endif %}</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">{{ streak.best_streak }}</span>
+                <span class="stat-label">{% if lang == 'ko' %}최장 연속 학습{% else %}Best Streak{% endif %}</span>
+            </div>
+        </div>
+        <div class="progress-bar xlarge" style="margin-bottom: var(--spacing-lg);">
+            <div class="progress-fill{% if overall.percentage == 100 %} complete{% endif %}"
+                 data-target-width="{{ overall.percentage }}"
+                 style="width: 0%;"></div>
+        </div>
+        {% for course in courses %}
+        <div class="dashboard-course">
+            <a href="{{ url_for('course_home', lang=lang, course_name=course.name) }}" class="dashboard-course-link">
+                <h3>{{ course.display_name }}</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill{% if course.progress.percentage == 100 %} complete{% endif %}"
+                         data-target-width="{{ course.progress.percentage }}"
+                         style="width: 0%;"></div>
+                </div>
+                <span class="progress-text">{{ course.progress.read }}/{{ course.progress.total }} ({{ course.progress.percentage }}%)</span>
+            </a>
+        </div>
+        {% endfor %}
+    </section>
+
+    {# ===== Section 6: Data Management ===== #}
+    {% if not auth_enabled or current_user.is_authenticated %}
+    <section class="home-section">
+        <h2>{% if lang == 'ko' %}데이터 관리{% else %}Data Management{% endif %}</h2>
+        <p class="data-management__desc">
+            {% if lang == 'ko' %}모든 학습 진행 데이터, 북마크, 어휘 진행 상황을 삭제합니다. 이 작업은 되돌릴 수 없습니다.{% else %}Delete all learning progress data, bookmarks, and vocabulary progress. This action cannot be undone.{% endif %}
+        </p>
+        <button class="btn btn-danger" id="clear-data-btn">
+            {% if lang == 'ko' %}모든 진행 데이터 삭제{% else %}Clear All Progress Data{% endif %}
+        </button>
+    </section>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% from "macros/icons.html" import icon %}
+
+{% block title %}{% if lang == 'ko' %}연습{% else %}Practice{% endif %} - {{ course_display }} - Language Viewer{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/practice.css') }}">
+{% endblock %}
+
+{% block header %}
+<nav class="breadcrumb">
+    <a href="{{ url_for('index', lang=lang) }}">{% if lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+    <span class="separator">/</span>
+    <a href="{{ url_for('course_home', lang=lang, course_name=course) }}">{{ course_display }}</a>
+    <span class="separator">/</span>
+    <span class="current">{% if lang == 'ko' %}연습{% else %}Practice{% endif %}</span>
+</nav>
+<h1>{{ icon('exercise', 24) }} {{ course_display }} {% if lang == 'ko' %}연습{% else %}Practice{% endif %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="drill-page">
+    <p class="practice-hub__desc">
+        {% if lang == 'ko' %}연습 유형을 선택하세요.{% else %}Choose a practice type to begin.{% endif %}
+    </p>
+
+    <div class="practice-hub__grid">
+        <!-- Conjugation Drill -->
+        <a href="{{ url_for('conjugation_drill', lang=lang, course_name=course) }}"
+           class="practice-hub__card">
+            <div class="practice-hub__card-icon">
+                {{ icon('grammar', 32) }}
+            </div>
+            <div class="practice-hub__card-info">
+                <h2 class="practice-hub__card-title">
+                    {% if lang == 'ko' %}활용 훈련{% else %}Conjugation Drill{% endif %}
+                </h2>
+                <p class="practice-hub__card-desc">
+                    {% if lang == 'ko' %}동사 활용을 연습하고 정확도를 높이세요.{% else %}Practice verb conjugations and improve your accuracy.{% endif %}
+                </p>
+            </div>
+        </a>
+
+        <!-- Flashcards -->
+        <a href="{{ url_for('flashcard_page', lang=lang, course_name=course) }}"
+           class="practice-hub__card">
+            <div class="practice-hub__card-icon">
+                {{ icon('flashcard', 32) }}
+            </div>
+            <div class="practice-hub__card-info">
+                <h2 class="practice-hub__card-title">
+                    {% if lang == 'ko' %}플래시카드{% else %}Flashcards{% endif %}
+                </h2>
+                <p class="practice-hub__card-desc">
+                    {% if lang == 'ko' %}어휘를 카드로 학습하고 복습하세요.{% else %}Study and review vocabulary with flashcards.{% endif %}
+                </p>
+            </div>
+        </a>
+
+        <!-- Quiz -->
+        <a href="{{ url_for('quiz_page', lang=lang, course_name=course) }}"
+           class="practice-hub__card">
+            <div class="practice-hub__card-icon">
+                {{ icon('exercise', 32) }}
+            </div>
+            <div class="practice-hub__card-info">
+                <h2 class="practice-hub__card-title">
+                    {% if lang == 'ko' %}퀴즈{% else %}Quiz{% endif %}
+                </h2>
+                <p class="practice-hub__card-desc">
+                    {% if lang == 'ko' %}어휘, 빈칸 채우기, 활용 문제로 실력을 테스트하세요.{% else %}Test your knowledge with vocabulary, fill-in-the-blank, and conjugation questions.{% endif %}
+                </p>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}

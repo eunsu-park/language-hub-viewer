@@ -1,0 +1,795 @@
+/* ===========================================
+   Grammar Reference - Styles
+   Matches the dark/light theme system via
+   data-theme attribute and CSS variables
+   from style.css.
+   =========================================== */
+
+/* Page Layout */
+.grammar-page {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* ===========================================
+   Sections
+   =========================================== */
+
+.grammar-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.grammar-section__title {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-primary);
+}
+
+.grammar-section__desc {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* ===========================================
+   Verb Grid
+   =========================================== */
+
+.verb-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-md);
+}
+
+.verb-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.verb-card:hover {
+    border-color: var(--accent-color);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    color: var(--text-primary);
+}
+
+.verb-card__header {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.verb-card__infinitive {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+}
+
+.verb-card__meaning {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.verb-card__badges {
+    display: flex;
+    gap: var(--spacing-xs);
+    flex-wrap: wrap;
+}
+
+/* ===========================================
+   Type Badges
+   =========================================== */
+
+.type-badge {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    border-radius: 12px;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+}
+
+.type-badge--regular {
+    background: rgba(25, 135, 84, 0.15);
+    color: #198754;
+}
+
+.type-badge--irregular {
+    background: rgba(255, 152, 0, 0.15);
+    color: #e68a00;
+}
+
+.type-badge--stem_change {
+    background: rgba(128, 0, 255, 0.15);
+    color: #7c3aed;
+}
+
+[data-theme="dark"] .type-badge--regular {
+    background: rgba(45, 211, 111, 0.2);
+    color: #6ee7a0;
+}
+
+[data-theme="dark"] .type-badge--irregular {
+    background: rgba(255, 183, 77, 0.2);
+    color: #ffcc80;
+}
+
+[data-theme="dark"] .type-badge--stem_change {
+    background: rgba(167, 139, 250, 0.2);
+    color: #c4b5fd;
+}
+
+/* ===========================================
+   Group Badges
+   =========================================== */
+
+.group-badge {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    border-radius: 12px;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+}
+
+.group-badge---ar {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+}
+
+.group-badge---er {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.group-badge---ir {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+[data-theme="dark"] .group-badge---ar {
+    background: rgba(96, 165, 250, 0.2);
+    color: #93c5fd;
+}
+
+[data-theme="dark"] .group-badge---er {
+    background: rgba(52, 211, 153, 0.2);
+    color: #6ee7b7;
+}
+
+[data-theme="dark"] .group-badge---ir {
+    background: rgba(252, 129, 129, 0.2);
+    color: #fca5a5;
+}
+
+/* ===========================================
+   Verb Header (conjugation detail page)
+   =========================================== */
+
+.verb-header {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.verb-header__main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.verb-header__infinitive {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.verb-header__meaning {
+    font-size: var(--font-size-lg);
+    color: var(--text-secondary);
+}
+
+.verb-header__badges {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+}
+
+.verb-header__actions {
+    margin-left: auto;
+}
+
+/* ===========================================
+   Tense Tabs
+   =========================================== */
+
+.tense-tabs {
+    display: flex;
+    gap: var(--spacing-xs);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    scrollbar-width: thin;
+}
+
+.tense-tabs::-webkit-scrollbar {
+    height: 4px;
+}
+
+.tense-tabs::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+    border-radius: 2px;
+}
+
+.tense-tabs::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: 2px;
+}
+
+.tense-tab {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all var(--transition-fast);
+}
+
+.tense-tab:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.tense-tab.active {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+}
+
+/* ===========================================
+   Conjugation Table
+   =========================================== */
+
+.conj-section {
+    display: none;
+}
+
+.conj-section.active {
+    display: block;
+}
+
+.conj-section__title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+}
+
+.conj-table {
+    width: 100%;
+    max-width: 600px;
+    border-collapse: collapse;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    margin-bottom: var(--spacing-lg);
+}
+
+.conj-table thead {
+    background: var(--bg-secondary);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.conj-table th {
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-align: left;
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.conj-table td {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.conj-table tr:last-child td {
+    border-bottom: none;
+}
+
+.conj-table__col-person {
+    width: 45%;
+}
+
+.conj-table__col-form {
+    width: 55%;
+}
+
+.conj-table__person {
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+}
+
+.conj-table__form {
+    font-weight: 600;
+    font-size: var(--font-size-lg);
+}
+
+/* Stem-change highlight */
+.conj-table .stem-change {
+    color: #7c3aed;
+    font-weight: 700;
+}
+
+[data-theme="dark"] .conj-table .stem-change {
+    color: #c4b5fd;
+}
+
+/* ===========================================
+   Rule Cards (index page)
+   =========================================== */
+
+.rule-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.rule-card {
+    display: block;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.rule-card:hover {
+    border-color: var(--accent-color);
+    box-shadow: var(--shadow-sm);
+    color: var(--text-primary);
+}
+
+.rule-card__header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
+}
+
+.rule-card__label {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+}
+
+.rule-card__category {
+    display: inline-block;
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--spacing-xs);
+}
+
+.rule-card__desc {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* ===========================================
+   Rule Detail Page
+   =========================================== */
+
+.rule-header {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.rule-header__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.rule-header__category {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.rule-header__desc {
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Rule Sections */
+.rule-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.rule-section__title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.rule-section__content {
+    line-height: 1.7;
+    color: var(--text-primary);
+}
+
+/* Contrast Table */
+.contrast-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.contrast-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.contrast-table thead {
+    background: var(--bg-secondary);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.contrast-table th {
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-align: left;
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.contrast-table td {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+    vertical-align: top;
+}
+
+.contrast-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Trigger Words */
+.trigger-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.trigger-group__label {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-primary);
+}
+
+.trigger-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.trigger-word {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-md);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Example Sentences */
+.example-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.example-item {
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+    border-left: 3px solid var(--accent-color);
+    border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
+}
+
+.example-item__sentence {
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-xs);
+}
+
+.example-item__translation {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-style: italic;
+    margin: 0 0 var(--spacing-xs);
+}
+
+.example-item__note {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Mnemonics */
+.mnemonic-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.mnemonic-item {
+    padding: var(--spacing-lg);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.mnemonic-item__acronym {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    letter-spacing: 0.15em;
+    margin-bottom: var(--spacing-sm);
+}
+
+.mnemonic-item__words {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.mnemonic-word {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-sm);
+}
+
+.mnemonic-word strong {
+    color: var(--accent-color);
+    font-size: var(--font-size-base);
+}
+
+.mnemonic-item__desc {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Si-Clause Chart */
+.si-clause-chart {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.si-clause-row {
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.si-clause-row__type {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.si-clause-type-label {
+    font-weight: 700;
+    font-size: var(--font-size-base);
+    color: var(--accent-color);
+}
+
+.si-clause-type-name {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.si-clause-row__structure {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+}
+
+.si-clause-part {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-sm);
+    min-width: 120px;
+}
+
+.si-clause-part__label {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.si-clause-part__tense {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.si-clause-arrow {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+}
+
+.si-clause-row__example {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-style: italic;
+    margin: 0;
+}
+
+/* ===========================================
+   Tense List (index page)
+   =========================================== */
+
+.tense-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.tense-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+}
+
+.tense-item__label {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.tense-item__id {
+    font-size: var(--font-size-xs);
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+}
+
+/* ===========================================
+   Empty State
+   =========================================== */
+
+.grammar-empty {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--text-secondary);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+/* ===========================================
+   Responsive
+   =========================================== */
+
+@media (max-width: 1024px) {
+    .verb-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .verb-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .verb-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .verb-header__actions {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .verb-header__actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .si-clause-row__structure {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .si-clause-arrow {
+        transform: rotate(90deg);
+    }
+
+    .si-clause-part {
+        min-width: unset;
+        width: 100%;
+    }
+
+    .contrast-table {
+        min-width: 400px;
+    }
+}
+
+@media (max-width: 480px) {
+    .verb-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tense-tab {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: var(--font-size-xs);
+    }
+
+    .conj-table__form {
+        font-size: var(--font-size-base);
+    }
+
+    .mnemonic-item__acronym {
+        font-size: 1.25rem;
+    }
+}

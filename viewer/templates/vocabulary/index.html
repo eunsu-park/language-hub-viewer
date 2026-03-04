@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% from "macros/icons.html" import icon %}
+
+{% block title %}{{ course_display }} Vocabulary - Language Viewer{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/vocabulary.css') }}">
+{% endblock %}
+
+{% block header %}
+<nav class="breadcrumb">
+    <a href="{{ url_for('index', lang=lang) }}">{% if lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+    <span class="separator">/</span>
+    <a href="{{ url_for('course_home', lang=lang, course_name=course) }}">{{ course_display }}</a>
+    <span class="separator">/</span>
+    <span class="current">{% if lang == 'ko' %}어휘{% else %}Vocabulary{% endif %}</span>
+</nav>
+<h1>{{ course_display }} {% if lang == 'ko' %}어휘{% else %}Vocabulary{% endif %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="vocab-page">
+    <!-- Filter Bar -->
+    <div class="vocab-filters">
+        <div class="vocab-filters__row">
+            <div class="vocab-filters__cefr">
+                <span class="vocab-filters__label">CEFR:</span>
+                {% for level in cefr_levels %}
+                <button class="cefr-filter-btn {% if filters.cefr == level %}active{% endif %}"
+                        data-level="{{ level }}"
+                        type="button">{{ level }}</button>
+                {% endfor %}
+                <button class="cefr-filter-btn {% if not filters.cefr %}active{% endif %}"
+                        data-level="all"
+                        type="button">{% if lang == 'ko' %}전체{% else %}All{% endif %}</button>
+            </div>
+
+            <div class="vocab-filters__lesson">
+                <label for="lesson-filter" class="sr-only">{% if lang == 'ko' %}레슨 필터{% else %}Filter by lesson{% endif %}</label>
+                <select id="lesson-filter" class="vocab-select">
+                    <option value="all">{% if lang == 'ko' %}모든 레슨{% else %}All Lessons{% endif %}</option>
+                    {% for lesson in lessons %}
+                    <option value="{{ lesson.number }}" {% if filters.lesson == lesson.number|string %}selected{% endif %}>
+                        {{ lesson.number }} - {{ lesson.title }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="vocab-filters__row">
+            <div class="vocab-search">
+                <label for="vocab-search-input" class="sr-only">{% if lang == 'ko' %}단어 검색{% else %}Search words{% endif %}</label>
+                <input type="search"
+                       id="vocab-search-input"
+                       class="vocab-search__input"
+                       placeholder="{% if lang == 'ko' %}단어 또는 뜻 검색...{% else %}Search words or translations...{% endif %}"
+                       value="{{ filters.q or '' }}">
+            </div>
+            <div class="vocab-actions">
+                <a href="{{ url_for('flashcard_page', lang=lang, course_name=course) }}" class="btn btn-primary vocab-study-btn" id="study-flashcards-btn">
+                    {% if lang == 'ko' %}플래시카드 학습{% else %}Study Flashcards{% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Word Count -->
+    <div class="vocab-count">
+        <span class="word-count" id="word-count">
+            {% if lang == 'ko' %}
+            {{ total_count }}개 중 <span id="showing-count">{{ words|length }}</span>개 표시
+            {% else %}
+            Showing <span id="showing-count">{{ words|length }}</span> of {{ total_count }} words
+            {% endif %}
+        </span>
+    </div>
+
+    <!-- Vocabulary Table -->
+    <div class="vocab-table-wrap">
+        <table class="vocab-table" id="vocab-table">
+            <thead>
+                <tr>
+                    <th class="vocab-table__col-word">{{ course_display }}</th>
+                    <th class="vocab-table__col-translation">{% if lang == 'ko' %}뜻{% else %}Translation{% endif %}</th>
+                    <th class="vocab-table__col-gender">{% if lang == 'ko' %}성{% else %}Gender{% endif %}</th>
+                    <th class="vocab-table__col-cefr">CEFR</th>
+                    <th class="vocab-table__col-lesson">{% if lang == 'ko' %}레슨{% else %}Lesson{% endif %}</th>
+                </tr>
+            </thead>
+            <tbody id="vocab-tbody">
+                {% for word in words %}
+                <tr class="vocab-row"
+                    data-word="{{ word.target }}"
+                    data-translation="{{ word.translation }}"
+                    data-gender="{{ word.gender or '' }}"
+                    data-cefr="{{ word.cefr or '' }}"
+                    data-lesson="{{ word.lesson or '' }}">
+                    <td class="vocab-row__word">
+                        {{ word.target }}
+                        <button class="tts-btn" type="button" data-text="{{ word.target }}" aria-label="{% if lang == 'ko' %}발음 듣기{% else %}Listen to pronunciation{% endif %}" title="{% if lang == 'ko' %}발음 듣기{% else %}Listen{% endif %}">{{ icon('speaker', 16) }}</button>
+                    </td>
+                    <td class="vocab-row__translation">{{ word.translation }}</td>
+                    <td class="vocab-row__gender">
+                        {% if word.gender %}
+                        <span class="gender-badge gender-badge--{{ word.gender }}">{{ word.gender }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="vocab-row__cefr">
+                        {% if word.cefr %}
+                        <span class="cefr-badge cefr-badge--{{ word.cefr|lower }}">{{ word.cefr }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="vocab-row__lesson">{{ word.lesson or '' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Empty State -->
+    <div class="vocab-empty" id="vocab-empty" style="display: none;">
+        <p>{% if lang == 'ko' %}일치하는 단어가 없습니다.{% else %}No words match your filters.{% endif %}</p>
+    </div>
+</div>
+
+<!-- Pass data to JS -->
+<script>
+    window.VOCAB_CONFIG = {
+        course: '{{ course }}',
+        lang: '{{ lang }}',
+        totalCount: {{ total_count }},
+        flashcardUrl: '{{ url_for("flashcard_page", lang=lang, course_name=course) }}'
+    };
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/vocabulary.js') }}"></script>
+<script>
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.tts-btn');
+    if (btn && window.TTS) {
+        e.preventDefault();
+        e.stopPropagation();
+        TTS.speak(btn.dataset.text);
+    }
+});
+</script>
+{% endblock %}

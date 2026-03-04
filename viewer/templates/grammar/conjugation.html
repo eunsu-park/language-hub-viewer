@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% from "macros/icons.html" import icon %}
+
+{% block title %}{{ verb_name }} - {% if lang == 'ko' %}활용{% else %}Conjugation{% endif %} - {{ course_display }} - Language Viewer{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/grammar.css') }}">
+{% endblock %}
+
+{% block header %}
+<nav class="breadcrumb">
+    <a href="{{ url_for('index', lang=lang) }}">{% if lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+    <span class="separator">/</span>
+    <a href="{{ url_for('course_home', lang=lang, course_name=course) }}">{{ course_display }}</a>
+    <span class="separator">/</span>
+    <a href="{{ url_for('grammar_index', lang=lang, course_name=course) }}">{% if lang == 'ko' %}문법{% else %}Grammar{% endif %}</a>
+    <span class="separator">/</span>
+    <span class="current">{{ verb_name }}</span>
+</nav>
+<h1>{{ verb_name }}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="grammar-page">
+    <!-- Verb Header -->
+    <div class="verb-header">
+        <div class="verb-header__main">
+            <span class="verb-header__infinitive">{{ verb.infinitive }}</span>
+            <button class="tts-btn" type="button" data-text="{{ verb.infinitive }}" aria-label="{% if lang == 'ko' %}발음 듣기{% else %}Listen to pronunciation{% endif %}" title="{% if lang == 'ko' %}발음 듣기{% else %}Listen{% endif %}">{{ icon('speaker', 18) }}</button>
+            <span class="verb-header__meaning">{{ verb.meaning|i18n(lang) }}</span>
+        </div>
+        <div class="verb-header__badges">
+            <span class="type-badge type-badge--{{ verb.type }}">
+                {% if verb.type == 'regular' %}
+                    {% if lang == 'ko' %}규칙{% else %}Regular{% endif %}
+                {% elif verb.type == 'irregular' %}
+                    {% if lang == 'ko' %}불규칙{% else %}Irregular{% endif %}
+                {% elif verb.type == 'stem_change' %}
+                    {% if lang == 'ko' %}어간변화{% else %}Stem-change{% endif %}
+                {% else %}
+                    {{ verb.type }}
+                {% endif %}
+            </span>
+            <span class="group-badge group-badge--{{ verb.group|lower }}">{{ verb.group }}</span>
+        </div>
+        <div class="verb-header__actions">
+            <a href="{{ url_for('conjugation_drill', lang=lang, course_name=course) }}?verb={{ verb.infinitive }}"
+               class="btn btn-primary">
+                {{ icon('exercise', 18) }}
+                {% if lang == 'ko' %}이 동사 연습{% else %}Practice this verb{% endif %}
+            </a>
+        </div>
+    </div>
+
+    <!-- Tense Tabs -->
+    {% if verb.tenses %}
+    <div class="tense-tabs" id="tense-tabs">
+        {% for tense_id, tense_data in verb.tenses.items() %}
+        <button class="tense-tab {% if loop.first %}active{% endif %}"
+                data-tense="{{ tense_id }}"
+                type="button">
+            {{ tense_id|replace('_', ' ')|title }}
+        </button>
+        {% endfor %}
+    </div>
+
+    <!-- Conjugation Tables -->
+    {% for tense_id, tense_data in verb.tenses.items() %}
+    <div class="conj-section {% if loop.first %}active{% endif %}" data-tense="{{ tense_id }}">
+        <h3 class="conj-section__title">{{ tense_id|replace('_', ' ')|title }}</h3>
+        <table class="conj-table">
+            <thead>
+                <tr>
+                    <th class="conj-table__col-person">{% if lang == 'ko' %}인칭{% else %}Person{% endif %}</th>
+                    <th class="conj-table__col-form">{% if lang == 'ko' %}활용형{% else %}Conjugation{% endif %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set persons = [
+                    {'key': 'yo', 'label_ko': 'yo (나)', 'label_en': 'yo (I)'},
+                    {'key': 'tú', 'label_ko': 'tú (너)', 'label_en': 'tú (you)'},
+                    {'key': 'él', 'label_ko': 'él/ella (그/그녀)', 'label_en': 'él/ella (he/she)'},
+                    {'key': 'nosotros', 'label_ko': 'nosotros (우리)', 'label_en': 'nosotros (we)'},
+                    {'key': 'vosotros', 'label_ko': 'vosotros (너희)', 'label_en': 'vosotros (you all)'},
+                    {'key': 'ellos', 'label_ko': 'ellos/ellas (그들)', 'label_en': 'ellos/ellas (they)'}
+                ] %}
+                {% for person in persons %}
+                {% set form_value = tense_data[person.key] if tense_data is mapping and person.key in tense_data else '' %}
+                <tr>
+                    <td class="conj-table__person">{{ person.label_ko if lang == 'ko' else person.label_en }}</td>
+                    <td class="conj-table__form">
+                        {% if form_value is string %}
+                        {{ form_value }}
+                        {% elif form_value is mapping and form_value.form is defined %}
+                        <span class="{% if form_value.stem_change %}stem-change{% endif %}">{{ form_value.form }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="grammar-empty">
+        <p>{% if lang == 'ko' %}이 동사의 활용 데이터가 아직 없습니다.{% else %}No conjugation data available for this verb yet.{% endif %}</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // TTS button handler
+    document.addEventListener('click', function(e) {
+        var btn = e.target.closest('.tts-btn');
+        if (btn && window.TTS) {
+            e.preventDefault();
+            e.stopPropagation();
+            TTS.speak(btn.dataset.text);
+        }
+    });
+
+    const tabs = document.querySelectorAll('.tense-tab');
+    const sections = document.querySelectorAll('.conj-section');
+
+    tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            const tense = this.dataset.tense;
+
+            // Update active tab
+            tabs.forEach(function(t) { t.classList.remove('active'); });
+            this.classList.add('active');
+
+            // Show matching section
+            sections.forEach(function(s) {
+                if (s.dataset.tense === tense) {
+                    s.classList.add('active');
+                } else {
+                    s.classList.remove('active');
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% from "macros/icons.html" import icon %}
+
+{% block title %}{% if lang == 'ko' %}플래시카드{% else %}Flashcards{% endif %} - {{ course_display }} - Language Viewer{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/flashcard.css') }}">
+{% endblock %}
+
+{% block header %}
+<nav class="breadcrumb">
+    <a href="{{ url_for('index', lang=lang) }}">{% if lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+    <span class="separator">/</span>
+    <a href="{{ url_for('course_home', lang=lang, course_name=course) }}">{{ course_display }}</a>
+    <span class="separator">/</span>
+    <a href="{{ url_for('vocabulary_index', lang=lang, course_name=course) }}">{% if lang == 'ko' %}어휘{% else %}Vocabulary{% endif %}</a>
+    <span class="separator">/</span>
+    <span class="current">{% if lang == 'ko' %}플래시카드{% else %}Flashcards{% endif %}</span>
+</nav>
+<h1>{% if lang == 'ko' %}플래시카드 학습{% else %}Flashcard Study{% endif %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="flashcard-page">
+    <!-- Loading State -->
+    <div class="flashcard-loading" id="flashcard-loading">
+        <div class="flashcard-loading__spinner"></div>
+        <p>{% if lang == 'ko' %}카드를 불러오는 중...{% else %}Loading cards...{% endif %}</p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="flashcard-empty" id="flashcard-empty" style="display: none;">
+        <h2>{% if lang == 'ko' %}카드가 없습니다{% else %}No Cards Available{% endif %}</h2>
+        <p>{% if lang == 'ko' %}선택한 필터에 맞는 단어가 없습니다.{% else %}No words match the selected filters.{% endif %}</p>
+        <a href="{{ url_for('vocabulary_index', lang=lang, course_name=course) }}" class="btn btn-primary">
+            {% if lang == 'ko' %}어휘 목록으로{% else %}Back to Vocabulary{% endif %}
+        </a>
+    </div>
+
+    <!-- Flashcard Container -->
+    <div class="flashcard-container" id="flashcard-container" style="display: none;">
+        <!-- Progress Bar -->
+        <div class="session-progress" id="session-progress">
+            <div class="session-progress__bar">
+                <div class="session-progress__fill" id="progress-fill"></div>
+            </div>
+            <div class="session-progress__stats">
+                <span class="session-progress__count">
+                    <span id="current-card">0</span> / <span id="total-cards">0</span>
+                </span>
+                <span class="session-progress__accuracy">
+                    {% if lang == 'ko' %}정답률{% else %}Correct{% endif %}: <span id="accuracy">0</span>%
+                </span>
+            </div>
+        </div>
+
+        <!-- Flashcard -->
+        <div class="flashcard" id="flashcard">
+            <div class="flashcard-inner" id="flashcard-inner">
+                <!-- Front -->
+                <div class="flashcard-front">
+                    <div class="flashcard-front__content">
+                        <span class="flashcard-word" id="card-word"></span>
+                        <span class="gender-badge" id="card-gender" style="display: none;"></span>
+                        <button class="tts-btn tts-btn--flashcard" id="card-tts-btn" type="button" aria-label="{% if lang == 'ko' %}발음 듣기{% else %}Listen to pronunciation{% endif %}" title="{% if lang == 'ko' %}발음 듣기{% else %}Listen{% endif %}">{{ icon('speaker', 20) }}</button>
+                    </div>
+                    <div class="flashcard-hint">
+                        {% if lang == 'ko' %}스페이스 바 또는 클릭으로 뒤집기{% else %}Press Space or click to flip{% endif %}
+                    </div>
+                </div>
+
+                <!-- Back -->
+                <div class="flashcard-back">
+                    <div class="flashcard-back__content">
+                        <span class="flashcard-word flashcard-word--back" id="card-word-back"></span>
+                        <span class="flashcard-translation" id="card-translation"></span>
+                        <div class="flashcard-meta" id="card-meta">
+                            <span class="flashcard-meta__lesson" id="card-lesson"></span>
+                            <span class="flashcard-meta__separator">&middot;</span>
+                            <span class="flashcard-meta__cefr" id="card-cefr"></span>
+                        </div>
+                    </div>
+                    <div class="grade-buttons" id="grade-buttons">
+                        <button class="grade-btn grade-btn--again" data-quality="1" type="button">
+                            <span class="grade-btn__key">1</span>
+                            <span class="grade-btn__label">{% if lang == 'ko' %}다시{% else %}Again{% endif %}</span>
+                        </button>
+                        <button class="grade-btn grade-btn--hard" data-quality="2" type="button">
+                            <span class="grade-btn__key">2</span>
+                            <span class="grade-btn__label">{% if lang == 'ko' %}어려움{% else %}Hard{% endif %}</span>
+                        </button>
+                        <button class="grade-btn grade-btn--good" data-quality="3" type="button">
+                            <span class="grade-btn__key">3</span>
+                            <span class="grade-btn__label">{% if lang == 'ko' %}좋음{% else %}Good{% endif %}</span>
+                        </button>
+                        <button class="grade-btn grade-btn--easy" data-quality="4" type="button">
+                            <span class="grade-btn__key">4</span>
+                            <span class="grade-btn__label">{% if lang == 'ko' %}쉬움{% else %}Easy{% endif %}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session Complete -->
+    <div class="session-complete" id="session-complete" style="display: none;">
+        <div class="session-complete__card">
+            <h2>{% if lang == 'ko' %}학습 완료!{% else %}Session Complete!{% endif %}</h2>
+            <div class="session-complete__stats">
+                <div class="session-complete__stat">
+                    <span class="session-complete__value" id="summary-total">0</span>
+                    <span class="session-complete__label">{% if lang == 'ko' %}복습한 카드{% else %}Cards Reviewed{% endif %}</span>
+                </div>
+                <div class="session-complete__stat">
+                    <span class="session-complete__value" id="summary-correct">0</span>
+                    <span class="session-complete__label">{% if lang == 'ko' %}정답{% else %}Correct{% endif %}</span>
+                </div>
+                <div class="session-complete__stat">
+                    <span class="session-complete__value" id="summary-accuracy">0%</span>
+                    <span class="session-complete__label">{% if lang == 'ko' %}정답률{% else %}Accuracy{% endif %}</span>
+                </div>
+            </div>
+            <div class="session-complete__actions">
+                <button class="btn btn-primary" id="restart-btn" type="button">
+                    {% if lang == 'ko' %}다시 학습{% else %}Study Again{% endif %}
+                </button>
+                <a href="{{ url_for('vocabulary_index', lang=lang, course_name=course) }}" class="btn">
+                    {% if lang == 'ko' %}어휘 목록{% else %}Vocabulary List{% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pass data to JS -->
+<script>
+    window.FLASHCARD_CONFIG = {
+        course: '{{ course }}',
+        lang: '{{ lang }}',
+        sessionId: ''
+    };
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/flashcard.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var ttsBtn = document.getElementById('card-tts-btn');
+    if (ttsBtn) {
+        ttsBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var wordEl = document.getElementById('card-word');
+            if (wordEl && window.TTS) {
+                TTS.speak(wordEl.textContent);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

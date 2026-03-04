@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% from "macros/icons.html" import icon %}
+
+{% block title %}{{ title }} - Language Viewer{% endblock %}
+
+{% block header %}
+<nav class="breadcrumb">
+    <a href="{{ url_for('index', lang=lang) }}">{% if lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+    <span class="separator">/</span>
+    <a href="{{ url_for('course_home', lang=lang, course_name=course) }}">{{ course }}</a>
+    <span class="separator">/</span>
+    <span class="current">{{ title }}</span>
+</nav>
+{% endblock %}
+
+{% macro lesson_toolbar(position) %}
+<div class="lesson-toolbar lesson-toolbar--{{ position }}">
+    <div class="toolbar-nav toolbar-nav--prev">
+        {% if prev_lesson %}
+        <a href="{{ url_for('lesson', lang=lang, course_name=course, filename=prev_lesson.filename) }}" class="nav-prev">
+            <span class="nav-label">Previous</span>
+            <span class="nav-title">{{ prev_lesson.title or prev_lesson.display_name }}</span>
+        </a>
+        {% else %}
+        <span class="nav-placeholder"></span>
+        {% endif %}
+    </div>
+    <div class="toolbar-actions">
+        {% if not auth_enabled or current_user.is_authenticated %}
+        <button class="btn btn-read {% if is_read %}active{% endif %}" data-action="mark-read" title="Mark as read" aria-pressed="{{ 'true' if is_read else 'false' }}">
+            <span class="icon"><span class="icon-check">{{ icon('check', 16) }}</span><span class="icon-circle">{{ icon('circle', 16) }}</span></span>
+            <span class="text">{% if is_read %}Read{% else %}Mark as read{% endif %}</span>
+        </button>
+        <button class="btn btn-bookmark {% if is_bookmarked %}active{% endif %}" data-action="bookmark" title="Bookmark" aria-pressed="{{ 'true' if is_bookmarked else 'false' }}">
+            <span class="icon">{{ icon('bookmark', 16) }}</span>
+            <span class="text">{% if is_bookmarked %}Bookmarked{% else %}Bookmark{% endif %}</span>
+        </button>
+        {% endif %}
+        <button class="btn btn-copy-link" data-action="copy-link" title="Copy link">
+            <span class="icon">{{ icon('link', 16) }}</span>
+            <span class="text">Copy link</span>
+        </button>
+        <a href="{{ url_for('course_home', lang=lang, course_name=course) }}" class="btn btn-topic-link" title="Back to course">
+            <span class="icon">{{ icon('list', 16) }}</span>
+            <span class="text">{% if lang == 'ko' %}목록{% else %}Course{% endif %}</span>
+        </a>
+    </div>
+    <div class="toolbar-nav toolbar-nav--next">
+        {% if next_lesson %}
+        <a href="{{ url_for('lesson', lang=lang, course_name=course, filename=next_lesson.filename) }}" class="nav-next">
+            <span class="nav-label">Next</span>
+            <span class="nav-title">{{ next_lesson.title or next_lesson.display_name }}</span>
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+{% block content %}
+<article class="lesson-article" data-lang="{{ lang }}" data-topic="{{ course }}" data-filename="{{ filename }}">
+    <header class="lesson-header">
+        <h1>{{ title }}</h1>
+    </header>
+
+    {{ lesson_toolbar('top') }}
+
+    {% if toc %}
+    <nav class="toc" id="toc">
+        <h2>Table of Contents</h2>
+        {{ toc|safe }}
+    </nav>
+    {% endif %}
+
+    <div class="lesson-content markdown-body">
+        {{ content|safe }}
+    </div>
+
+    {{ lesson_toolbar('bottom') }}
+
+    <div class="toolbar-keyboard-hint">
+        <kbd>&larr;</kbd> <kbd>&rarr;</kbd> {% if lang == 'ko' %}레슨 이동{% else %}to navigate between lessons{% endif %}
+    </div>
+</article>
+
+<button class="scroll-to-top" id="scroll-to-top" title="Scroll to top" aria-label="Scroll to top">&uarr;</button>
+{% endblock %}
+
+{% block scripts %}
+<script>
+window.LESSON_VOCAB = {{ lesson_vocab|tojson|safe }};
+</script>
+<script src="{{ url_for('static', filename='js/lesson.js') }}"></script>
+{% endblock %}

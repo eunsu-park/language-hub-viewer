@@ -1,0 +1,438 @@
+/* ===========================================
+   Flashcard - Styles
+   Matches the dark/light theme system via
+   data-theme attribute and CSS variables
+   from style.css.
+   =========================================== */
+
+/* Page Layout */
+.flashcard-page {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: var(--spacing-md) 0;
+}
+
+/* Loading State */
+.flashcard-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl) 0;
+    color: var(--text-secondary);
+    gap: var(--spacing-md);
+}
+
+.flashcard-loading__spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--accent-color);
+    border-radius: 50%;
+    animation: flashcard-spin 0.8s linear infinite;
+}
+
+@keyframes flashcard-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.flashcard-empty {
+    text-align: center;
+    padding: var(--spacing-xl);
+    background: var(--bg-primary);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+}
+
+.flashcard-empty h2 {
+    margin-bottom: var(--spacing-sm);
+}
+
+.flashcard-empty p {
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* ===========================================
+   Session Progress
+   =========================================== */
+
+.session-progress {
+    margin-bottom: var(--spacing-lg);
+}
+
+.session-progress__bar {
+    height: 8px;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: var(--spacing-sm);
+}
+
+.session-progress__fill {
+    height: 100%;
+    background: var(--accent-color);
+    border-radius: 4px;
+    transition: width var(--transition-base);
+    min-width: 0;
+}
+
+.session-progress__stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.session-progress__count {
+    font-weight: 500;
+}
+
+.session-progress__accuracy {
+    font-weight: 500;
+}
+
+/* ===========================================
+   Flashcard
+   =========================================== */
+
+.flashcard-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.flashcard {
+    perspective: 1000px;
+    cursor: pointer;
+    margin-bottom: var(--spacing-lg);
+}
+
+.flashcard-inner {
+    position: relative;
+    width: 100%;
+    min-height: 320px;
+    transition: transform 0.5s ease;
+    transform-style: preserve-3d;
+}
+
+.flashcard-inner.flipped {
+    transform: rotateY(180deg);
+}
+
+.flashcard-front,
+.flashcard-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 320px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    background: var(--bg-primary);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+}
+
+.flashcard-back {
+    transform: rotateY(180deg);
+}
+
+/* Front content */
+.flashcard-front__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex: 1;
+    justify-content: center;
+}
+
+.flashcard-word {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+    line-height: 1.3;
+}
+
+.flashcard-word--back {
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-xs);
+}
+
+.flashcard-hint {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin-top: auto;
+    padding-top: var(--spacing-md);
+}
+
+/* Back content */
+.flashcard-back__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex: 1;
+    justify-content: center;
+    padding-bottom: var(--spacing-md);
+}
+
+.flashcard-translation {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    text-align: center;
+    line-height: 1.4;
+}
+
+.flashcard-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin-top: var(--spacing-xs);
+}
+
+.flashcard-meta__separator {
+    color: var(--text-muted);
+}
+
+/* ===========================================
+   Gender Badge
+   =========================================== */
+
+.gender-badge {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    border-radius: 12px;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: lowercase;
+}
+
+.gender-badge--m {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+}
+
+.gender-badge--f {
+    background: rgba(236, 72, 153, 0.15);
+    color: #ec4899;
+}
+
+.gender-badge--n {
+    background: rgba(107, 114, 128, 0.15);
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .gender-badge--m {
+    background: rgba(96, 165, 250, 0.2);
+    color: #93bbfd;
+}
+
+[data-theme="dark"] .gender-badge--f {
+    background: rgba(244, 114, 182, 0.2);
+    color: #f9a8d4;
+}
+
+[data-theme="dark"] .gender-badge--n {
+    background: rgba(156, 163, 175, 0.2);
+    color: #9ca3af;
+}
+
+/* ===========================================
+   Grade Buttons
+   =========================================== */
+
+.grade-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-sm);
+    width: 100%;
+    margin-top: auto;
+    padding-top: var(--spacing-md);
+}
+
+.grade-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: var(--spacing-sm) var(--spacing-xs);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.grade-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.grade-btn:active {
+    transform: translateY(0);
+}
+
+.grade-btn__key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: var(--border-radius-sm);
+    background: var(--bg-tertiary);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.grade-btn__label {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+/* Grade button color variants */
+.grade-btn--again {
+    border-color: rgba(220, 53, 69, 0.3);
+}
+.grade-btn--again:hover {
+    background: rgba(220, 53, 69, 0.1);
+    border-color: var(--danger-color);
+}
+
+.grade-btn--hard {
+    border-color: rgba(255, 193, 7, 0.3);
+}
+.grade-btn--hard:hover {
+    background: rgba(255, 193, 7, 0.1);
+    border-color: var(--warning-color);
+}
+
+.grade-btn--good {
+    border-color: rgba(25, 135, 84, 0.3);
+}
+.grade-btn--good:hover {
+    background: rgba(25, 135, 84, 0.1);
+    border-color: var(--success-color);
+}
+
+.grade-btn--easy {
+    border-color: rgba(13, 110, 253, 0.3);
+}
+.grade-btn--easy:hover {
+    background: rgba(13, 110, 253, 0.1);
+    border-color: var(--accent-color);
+}
+
+/* ===========================================
+   Session Complete
+   =========================================== */
+
+.session-complete {
+    max-width: 500px;
+    margin: var(--spacing-xl) auto;
+}
+
+.session-complete__card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-xl);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+}
+
+.session-complete__card h2 {
+    margin-bottom: var(--spacing-lg);
+    color: var(--text-primary);
+}
+
+.session-complete__stats {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.session-complete__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.session-complete__value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.session-complete__label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.session-complete__actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-md);
+}
+
+/* ===========================================
+   Responsive
+   =========================================== */
+
+@media (max-width: 600px) {
+    .flashcard-inner {
+        min-height: 280px;
+    }
+
+    .flashcard-front,
+    .flashcard-back {
+        min-height: 280px;
+        padding: var(--spacing-lg);
+    }
+
+    .flashcard-word {
+        font-size: 1.5rem;
+    }
+
+    .flashcard-word--back {
+        font-size: 1.25rem;
+    }
+
+    .flashcard-translation {
+        font-size: 1.1rem;
+    }
+
+    .grade-buttons {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .session-complete__stats {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    .session-complete__actions {
+        flex-direction: column;
+    }
+
+    .session-complete__actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

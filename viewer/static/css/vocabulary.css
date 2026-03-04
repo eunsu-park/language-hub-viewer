@@ -1,0 +1,388 @@
+/* ===========================================
+   Vocabulary List - Styles
+   Matches the dark/light theme system via
+   data-theme attribute and CSS variables
+   from style.css.
+   =========================================== */
+
+/* Page Layout */
+.vocab-page {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* ===========================================
+   Filter Bar
+   =========================================== */
+
+.vocab-filters {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.vocab-filters__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.vocab-filters__label {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-right: var(--spacing-xs);
+}
+
+.vocab-filters__cefr {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.vocab-filters__lesson {
+    margin-left: auto;
+}
+
+/* CEFR Filter Buttons */
+.cefr-filter-btn {
+    padding: var(--spacing-xs) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.cefr-filter-btn:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.cefr-filter-btn.active {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+}
+
+/* Lesson Select */
+.vocab-select {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    font-family: inherit;
+    cursor: pointer;
+    min-width: 180px;
+}
+
+.vocab-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+/* Search Input */
+.vocab-search {
+    flex: 1;
+    min-width: 200px;
+}
+
+.vocab-search__input {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    font-family: inherit;
+}
+
+.vocab-search__input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.vocab-search__input::placeholder {
+    color: var(--text-muted);
+}
+
+/* Study Button */
+.vocab-actions {
+    flex-shrink: 0;
+}
+
+.vocab-study-btn {
+    white-space: nowrap;
+}
+
+/* ===========================================
+   Word Count
+   =========================================== */
+
+.vocab-count {
+    margin-bottom: var(--spacing-md);
+}
+
+.word-count {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+/* ===========================================
+   Vocabulary Table
+   =========================================== */
+
+.vocab-table-wrap {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.vocab-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-sm);
+}
+
+.vocab-table thead {
+    background: var(--bg-secondary);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.vocab-table th {
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-align: left;
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.vocab-table td {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+/* Column widths */
+.vocab-table__col-word {
+    width: 30%;
+}
+
+.vocab-table__col-translation {
+    width: 30%;
+}
+
+.vocab-table__col-gender {
+    width: 10%;
+    text-align: center;
+}
+
+.vocab-table__col-cefr {
+    width: 10%;
+    text-align: center;
+}
+
+.vocab-table__col-lesson {
+    width: 10%;
+    text-align: center;
+}
+
+/* Row Styles */
+.vocab-row {
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.vocab-row:hover {
+    background: var(--bg-secondary);
+}
+
+.vocab-row--active {
+    background: var(--bg-tertiary);
+}
+
+.vocab-row:last-child td {
+    border-bottom: none;
+}
+
+.vocab-row__word {
+    font-weight: 500;
+}
+
+.vocab-row__translation {
+    color: var(--text-secondary);
+}
+
+.vocab-row__gender {
+    text-align: center;
+}
+
+.vocab-row__cefr {
+    text-align: center;
+}
+
+.vocab-row__lesson {
+    text-align: center;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+}
+
+/* ===========================================
+   Gender Badge (shared with flashcard.css)
+   =========================================== */
+
+.gender-badge {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    border-radius: 12px;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: lowercase;
+}
+
+.gender-badge--m {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+}
+
+.gender-badge--f {
+    background: rgba(236, 72, 153, 0.15);
+    color: #ec4899;
+}
+
+.gender-badge--n {
+    background: rgba(107, 114, 128, 0.15);
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .gender-badge--m {
+    background: rgba(96, 165, 250, 0.2);
+    color: #93bbfd;
+}
+
+[data-theme="dark"] .gender-badge--f {
+    background: rgba(244, 114, 182, 0.2);
+    color: #f9a8d4;
+}
+
+[data-theme="dark"] .gender-badge--n {
+    background: rgba(156, 163, 175, 0.2);
+    color: #9ca3af;
+}
+
+/* ===========================================
+   CEFR Badge Variants
+   =========================================== */
+
+.cefr-badge--a1 {
+    background: #198754;
+}
+
+.cefr-badge--a2 {
+    background: #20c997;
+    color: #000;
+}
+
+.cefr-badge--b1 {
+    background: #0d6efd;
+}
+
+.cefr-badge--b2 {
+    background: #6610f2;
+}
+
+.cefr-badge--c1 {
+    background: #fd7e14;
+}
+
+.cefr-badge--c2 {
+    background: #dc3545;
+}
+
+/* ===========================================
+   Empty State
+   =========================================== */
+
+.vocab-empty {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--text-secondary);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+/* ===========================================
+   Responsive
+   =========================================== */
+
+@media (max-width: 768px) {
+    .vocab-filters__row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .vocab-filters__lesson {
+        margin-left: 0;
+    }
+
+    .vocab-filters__cefr {
+        justify-content: flex-start;
+    }
+
+    .vocab-select {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .vocab-search {
+        min-width: unset;
+    }
+
+    .vocab-actions {
+        width: 100%;
+    }
+
+    .vocab-study-btn {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+
+    /* Make table scroll horizontally on small screens */
+    .vocab-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .vocab-table {
+        min-width: 500px;
+    }
+}
+
+@media (max-width: 480px) {
+    .vocab-filters {
+        padding: var(--spacing-md);
+    }
+
+    .cefr-filter-btn {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: var(--font-size-xs);
+    }
+}

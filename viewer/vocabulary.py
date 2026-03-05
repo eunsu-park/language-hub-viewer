@@ -82,15 +82,22 @@ def _resolve_i18n(value, lang: str) -> str:
 def get_all_words(course: str, lang: str | None = None) -> list[dict]:
     """Flatten all categories from all lessons into a single word list.
 
-    Each returned dict contains the word data (``spanish``, ``translation``,
+    Each returned dict contains the word data (``target``, ``translation``,
     ``gender``, ``notes``) plus context keys: ``lesson``, ``lesson_number``,
     ``cefr``, and ``category``.
+
+    The target-language word is read from a dynamic YAML key derived from the
+    course name (e.g. ``spanish`` for Spanish, ``german`` for German).  A
+    ``"target"`` fallback key is also tried so that future YAML files can use
+    a generic field name.
 
     When *lang* is provided, bilingual fields (translation, notes, category
     label) are resolved to the matching language string.
     """
     if lang is None:
         lang = Config.DEFAULT_LANGUAGE
+
+    word_key = course.lower()  # "Spanish" -> "spanish", "German" -> "german"
 
     words: list[dict] = []
     for lesson in load_vocabulary(course):
@@ -101,7 +108,7 @@ def get_all_words(course: str, lang: str | None = None) -> list[dict]:
             cat_id = cat.get("id", "")
             cat_label = _resolve_i18n(cat.get("label", ""), lang)
             for word in cat.get("words", []):
-                spanish = word.get("spanish", "")
+                target = word.get(word_key, word.get("target", ""))
                 translation = _resolve_i18n(word.get("translation", ""), lang)
                 notes = _resolve_i18n(word.get("notes", ""), lang)
                 gender = word.get("gender") or ""
@@ -111,12 +118,11 @@ def get_all_words(course: str, lang: str | None = None) -> list[dict]:
                     "cefr": cefr,
                     "category": cat_id,
                     "category_label": cat_label,
-                    "spanish": spanish,
-                    "target": spanish,
+                    "target": target,
                     "translation": translation,
                     "gender": gender,
                     "notes": notes,
-                    "word_key": f"{lesson_num}:{cat_id}:{spanish}",
+                    "word_key": f"{lesson_num}:{cat_id}:{target}",
                 })
     return words
 

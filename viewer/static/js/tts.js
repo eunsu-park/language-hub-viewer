@@ -1,6 +1,7 @@
 /**
  * Text-to-Speech utility using Web Speech API.
- * Provides speakSpanish() for playing Spanish pronunciation.
+ * Provides speak() for playing pronunciation in the current course language.
+ * The locale is read from window.COURSE_LANG (set by base.html), defaulting to 'es-ES'.
  */
 (function() {
     'use strict';
@@ -9,22 +10,28 @@
     var supported = 'speechSynthesis' in window;
 
     /**
-     * Speak text in Spanish using Web Speech API.
-     * @param {string} text - The Spanish text to speak
+     * Speak text using Web Speech API in the course target language.
+     * @param {string} text - The text to speak
      * @param {number} rate - Speech rate (0.1 to 2.0, default 0.85)
      */
-    function speakSpanish(text, rate) {
+    function speak(text, rate) {
         if (!supported || !text) return;
         // Cancel any ongoing speech
         speechSynthesis.cancel();
+
+        var locale = window.COURSE_LANG || 'es-ES';
+        var langPrefix = locale.split('-')[0]; // "es-ES" -> "es", "de-DE" -> "de"
+
         var utterance = new SpeechSynthesisUtterance(text.trim());
-        utterance.lang = 'es-ES';
+        utterance.lang = locale;
         utterance.rate = rate || 0.85;
         utterance.pitch = 1.0;
-        // Try to find a Spanish voice
+
+        // Try to find a voice matching the locale
         var voices = speechSynthesis.getVoices();
-        var spanishVoice = voices.find(function(v) { return v.lang.startsWith('es'); });
-        if (spanishVoice) utterance.voice = spanishVoice;
+        var voice = voices.find(function(v) { return v.lang.startsWith(langPrefix); });
+        if (voice) utterance.voice = voice;
+
         speechSynthesis.speak(utterance);
     }
 
@@ -37,7 +44,7 @@
 
     // Export globally
     window.TTS = {
-        speak: speakSpanish,
+        speak: speak,
         isSupported: isTtsSupported
     };
 

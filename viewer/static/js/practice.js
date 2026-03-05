@@ -8,16 +8,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const config = window.DRILL_CONFIG;
     if (!config) return;
 
-    // Accent mappings: base letter -> accented version
-    const ACCENT_MAP = {
-        'a': '\u00e1',  // a
-        'e': '\u00e9',  // e
-        'i': '\u00ed',  // i
-        'o': '\u00f3',  // o
-        'u': '\u00fa',  // u
-        'n': '\u00f1',  // n
-        'u-diaeresis': '\u00fc'  // u
-    };
+    // Accent characters from course config (set in base.html)
+    var ACCENT_CHARS = window.ACCENT_CHARS || ['\u00e1','\u00e9','\u00ed','\u00f3','\u00fa','\u00f1','\u00fc'];
 
     // DOM elements
     const verbFilter = document.getElementById('verb-filter');
@@ -103,14 +95,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Build accent helper buttons dynamically from ACCENT_CHARS
+    accentHelpers.innerHTML = '';
+    ACCENT_CHARS.forEach(function(ch) {
+        var btn = document.createElement('button');
+        btn.className = 'accent-btn';
+        btn.type = 'button';
+        btn.dataset.char = ch;
+        btn.textContent = ch;
+        accentHelpers.appendChild(btn);
+    });
+
     // Accent helper buttons
     accentHelpers.addEventListener('click', function(e) {
         var btn = e.target.closest('.accent-btn');
         if (!btn) return;
         e.preventDefault();
 
-        var charKey = btn.dataset.char;
-        var accentChar = ACCENT_MAP[charKey];
+        var accentChar = btn.dataset.char;
         if (!accentChar) return;
 
         insertAtCursor(answerInput, accentChar);

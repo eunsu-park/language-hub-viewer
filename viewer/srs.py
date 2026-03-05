@@ -172,8 +172,8 @@ def get_session_cards(
 # ---------------------------------------------------------------------------
 
 def _make_word_key(word: dict) -> str:
-    """Build a unique key for a word: ``lesson_number:category:spanish``."""
-    return f"{word.get('lesson_number', 0)}:{word.get('category', '')}:{word.get('spanish', '')}"
+    """Build a unique key for a word: ``lesson_number:category:target``."""
+    return f"{word.get('lesson_number', 0)}:{word.get('category', '')}:{word.get('target', '')}"
 
 
 def _progress_to_dict(progress: VocabularyProgress, word_lookup: dict | None = None) -> dict:
@@ -198,7 +198,7 @@ def _progress_to_dict(progress: VocabularyProgress, word_lookup: dict | None = N
     if word_lookup and progress.word_key in word_lookup:
         w = word_lookup[progress.word_key]
         card.update({
-            "target": w.get("target", w.get("spanish", "")),
+            "target": w.get("target", ""),
             "translation": w.get("translation", ""),
             "gender": w.get("gender", ""),
             "cefr": w.get("cefr", ""),
@@ -206,7 +206,7 @@ def _progress_to_dict(progress: VocabularyProgress, word_lookup: dict | None = N
             "lesson_number": w.get("lesson_number", 0),
         })
     else:
-        # Fallback: parse word_key "lesson_num:category:spanish"
+        # Fallback: parse word_key "lesson_num:category:target"
         parts = progress.word_key.split(":", 2)
         card["target"] = parts[2] if len(parts) > 2 else progress.word_key
         card["translation"] = ""

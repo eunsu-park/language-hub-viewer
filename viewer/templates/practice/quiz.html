@@ -106,18 +106,12 @@
                 <input type="text"
                        id="quiz-answer-input"
                        class="drill-input"
-                       placeholder="{% if lang == 'ko' %}스페인어 단어를 입력하세요...{% else %}Type the Spanish word...{% endif %}"
+                       placeholder="{% if lang == 'ko' %}{{ course_lang.name | i18n('ko') | default('스페인어') }} 단어를 입력하세요...{% else %}Type the {{ course_lang.name | i18n('en') | default('Spanish') }} word...{% endif %}"
                        autocomplete="off"
                        autocapitalize="off"
                        spellcheck="false">
                 <div class="accent-helpers" id="quiz-accent-helpers">
-                    <button class="accent-btn" data-char="a" type="button">&aacute;</button>
-                    <button class="accent-btn" data-char="e" type="button">&eacute;</button>
-                    <button class="accent-btn" data-char="i" type="button">&iacute;</button>
-                    <button class="accent-btn" data-char="o" type="button">&oacute;</button>
-                    <button class="accent-btn" data-char="u" type="button">&uacute;</button>
-                    <button class="accent-btn" data-char="n" type="button">&ntilde;</button>
-                    <button class="accent-btn" data-char="u-diaeresis" type="button">&uuml;</button>
+                    <!-- Accent buttons are built dynamically by quiz.js from window.ACCENT_CHARS -->
                 </div>
             </div>
             <button class="btn btn-primary drill-btn" id="quiz-submit-btn" type="button">

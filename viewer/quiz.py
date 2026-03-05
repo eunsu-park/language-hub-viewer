@@ -1,8 +1,8 @@
 """Quiz question generation from vocabulary and grammar YAML.
 
 Supports four quiz types:
-- vocab: multiple-choice (Spanish word -> pick correct translation)
-- fill_blank: type the Spanish word given the translation
+- vocab: multiple-choice (target word -> pick correct translation)
+- fill_blank: type the target word given the translation
 - conjugation: multiple-choice (verb+tense+person -> pick correct form)
 - mixed: balanced mix of all three types
 """
@@ -40,8 +40,8 @@ def generate_vocab_quiz(
 ) -> list[dict]:
     """Generate vocabulary multiple-choice questions.
 
-    Each question shows a Spanish word; the user picks the correct translation
-    from 4 choices.
+    Each question shows a target-language word; the user picks the correct
+    translation from 4 choices.
     """
     from vocabulary import get_all_words
 
@@ -99,7 +99,7 @@ def generate_vocab_quiz(
 
         questions.append({
             "question_type": "vocab",
-            "prompt": word["spanish"],
+            "prompt": word["target"],
             "choices": choices,
             "answer_key": "correct",
             "hint": hint or None,
@@ -119,7 +119,7 @@ def generate_fill_blank_quiz(
 ) -> list[dict]:
     """Generate fill-in-the-blank questions.
 
-    Show the translation as the prompt; the user types the Spanish word.
+    Show the translation as the prompt; the user types the target-language word.
     """
     from vocabulary import get_all_words
 
@@ -149,8 +149,8 @@ def generate_fill_blank_quiz(
         questions.append({
             "question_type": "fill_blank",
             "prompt": word["translation"],
-            "answer": word["spanish"],
-            "answer_key": word["spanish"],
+            "answer": word["target"],
+            "answer_key": word["target"],
             "hint": " - ".join(hint_parts) if hint_parts else None,
             "cefr": word.get("cefr", ""),
             "word_key": word.get("word_key", ""),

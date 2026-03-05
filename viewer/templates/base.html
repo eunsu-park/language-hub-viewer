@@ -113,6 +113,17 @@
         </main>
     </div>
 
+    <script>
+        {% if course_lang is defined and course_lang %}
+        window.COURSE_LANG = "{{ course_lang.tts_locale | default('es-ES') }}";
+        window.ACCENT_CHARS = {{ course_lang.accent_chars | default(['á','é','í','ó','ú','ñ','ü']) | tojson }};
+        window.COURSE_WORD_KEY = "{{ course_lang.word_key | default('spanish') }}";
+        {% else %}
+        window.COURSE_LANG = "es-ES";
+        window.ACCENT_CHARS = [];
+        window.COURSE_WORD_KEY = "spanish";
+        {% endif %}
+    </script>
     <script src="{{ url_for('static', filename='js/tts.js') }}"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script>

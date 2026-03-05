@@ -106,16 +106,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Sort by word length descending to match longer phrases first
         var words = vocabData.slice().sort(function(a, b) {
-            return (b.spanish || '').length - (a.spanish || '').length;
+            return (b.target || '').length - (a.target || '').length;
         });
 
         // Build regex patterns for each word
         var wordEntries = [];
         words.forEach(function(w) {
-            var spanish = w.spanish;
-            if (!spanish || spanish.length < 2) return;
+            var target = w.target;
+            if (!target || target.length < 2) return;
             // Escape regex special characters
-            var escaped = spanish.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            var escaped = target.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             // Use word boundary that handles accented characters
             var pattern = new RegExp('(?:^|(?<=[\\s,;:.!?()\\[\\]"\']))(' + escaped + ')(?=[\\s,;:.!?()\\[\\]"\']|$)', 'gi');
             wordEntries.push({ word: w, pattern: pattern });
@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var span = document.createElement('span');
             span.className = 'vocab-tooltip';
             span.textContent = matched;
-            span.setAttribute('data-word', w.spanish || '');
+            span.setAttribute('data-word', w.target || '');
             span.setAttribute('data-translation', w.translation || '');
             span.setAttribute('data-gender', w.gender || '');
             span.setAttribute('data-notes', w.notes || '');
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Process: for each word, scan all text nodes and wrap first occurrence
         var matched = {};
         wordEntries.forEach(function(entry) {
-            var key = (entry.word.spanish || '').toLowerCase();
+            var key = (entry.word.target || '').toLowerCase();
             if (matched[key]) return; // Only mark first occurrence per word
 
             var textNodes = getTextNodes(contentEl);

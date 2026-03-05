@@ -192,6 +192,22 @@ def get_courses() -> list[dict]:
     return courses
 
 
+def get_course_lang(course: str) -> dict:
+    """Extract language config from course metadata for template use.
+
+    Returns a dict with keys: word_key, tts_locale, accent_chars, name.
+    Falls back to Spanish defaults if not specified in metadata.
+    """
+    meta = load_course_metadata(course)
+    lang_info = meta.get("language", {})
+    return {
+        "word_key": lang_info.get("word_key", course.lower()),
+        "tts_locale": lang_info.get("tts_locale", "es-ES"),
+        "accent_chars": lang_info.get("accent_chars", ["á", "é", "í", "ó", "ú", "ñ", "ü"]),
+        "name": lang_info.get("name", {}),
+    }
+
+
 def get_content_dir(course: str, lang: str) -> Path:
     """Get content directory: content/<Course>/<lang>/"""
     return CONTENT_DIR / course / lang
@@ -359,6 +375,7 @@ def course_home(lang: str, course_name: str):
         staged_lessons=staged_lessons,
         overall=overall,
         continue_lesson=continue_lesson,
+        course_lang=get_course_lang(course_name),
         lang=lang,
         languages=get_available_languages(),
     )
@@ -427,6 +444,7 @@ def lesson(lang: str, course_name: str, filename: str):
         prev_lesson=prev_lesson,
         next_lesson=next_lesson,
         lesson_vocab=lesson_vocab,
+        course_lang=get_course_lang(course_name),
         lang=lang,
         languages=get_available_languages(),
     )
@@ -665,6 +683,7 @@ def vocabulary_index(lang: str, course_name: str):
         cefr_levels=cefr_set,
         lessons=lesson_list,
         filters=filters,
+        course_lang=get_course_lang(course_name),
         lang=lang,
         languages=get_available_languages(),
     )
@@ -685,6 +704,7 @@ def flashcard_page(lang: str, course_name: str):
         "vocabulary/flashcard.html",
         course=course_name,
         course_display=lang_info.get("name", {}).get("native", course_name),
+        course_lang=get_course_lang(course_name),
         lang=lang,
         languages=get_available_languages(),
     )
@@ -783,6 +803,7 @@ def grammar_index(lang: str, course_name: str):
         rules=rules,
         tenses=tenses,
         verbs=verbs,
+        course_lang=get_course_lang(course_name),
         lang=lang,
         languages=get_available_languages(),
     )
@@ -811,6 +832,7 @@ def grammar_verb(lang: str, course_name: str, verb: str):
         verb_name=verb,
         verb=verb_data,
         tenses=tenses,
+        course_lang=get_course_lang(course_name),
         lang=lang,
         languages=get_available_languages(),
     )
@@ -836,6 +858,7 @@ def grammar_rule(lang: str, course_name: str, rule_id: str):
         course_display=lang_info.get("name", {}).get("native", course_name),
         rule_id=rule_id,
         rule=rule_data,
+        course_lang=get_course_lang(course_name),
         lang=lang,
         languages=get_available_languages(),
     )
@@ -857,6 +880,7 @@ def practice_hub(lang: str, course_name: str):
         "practice/hub.html",
         course=course_name,
         course_display=lang_info.get("name", {}).get("native", course_name),
+        course_lang=get_course_lang(course_name),
         lang=lang,
         languages=get_available_languages(),
     )
@@ -881,6 +905,7 @@ def conjugation_drill(lang: str, course_name: str):
         course_display=lang_info.get("name", {}).get("native", course_name),
         verbs=verbs,
         tenses=tenses,
+        course_lang=get_course_lang(course_name),
         lang=lang,
         languages=get_available_languages(),
     )
@@ -982,6 +1007,7 @@ def quiz_page(lang: str, course_name: str):
         course_display=lang_info.get("name", {}).get("native", course_name),
         cefr_levels=cefr_set,
         lessons=lesson_list,
+        course_lang=get_course_lang(course_name),
         lang=lang,
         languages=get_available_languages(),
     )

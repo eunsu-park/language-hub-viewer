@@ -9,16 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var config = window.QUIZ_CONFIG;
     if (!config) return;
 
-    // Accent mappings: base letter -> accented version
-    var ACCENT_MAP = {
-        'a': '\u00e1',
-        'e': '\u00e9',
-        'i': '\u00ed',
-        'o': '\u00f3',
-        'u': '\u00fa',
-        'n': '\u00f1',
-        'u-diaeresis': '\u00fc'
-    };
+    // Accent characters from course config (set in base.html)
+    var ACCENT_CHARS = window.ACCENT_CHARS || ['\u00e1','\u00e9','\u00ed','\u00f3','\u00fa','\u00f1','\u00fc'];
 
     function getCsrfToken() {
         var meta = document.querySelector('meta[name="csrf-token"]');
@@ -99,14 +91,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Build accent helper buttons dynamically from ACCENT_CHARS
+    accentHelpers.innerHTML = '';
+    ACCENT_CHARS.forEach(function(ch) {
+        var btn = document.createElement('button');
+        btn.className = 'accent-btn';
+        btn.type = 'button';
+        btn.dataset.char = ch;
+        btn.textContent = ch;
+        accentHelpers.appendChild(btn);
+    });
+
     // Accent helper buttons
     accentHelpers.addEventListener('click', function(e) {
         var btn = e.target.closest('.accent-btn');
         if (!btn) return;
         e.preventDefault();
 
-        var charKey = btn.dataset.char;
-        var accentChar = ACCENT_MAP[charKey];
+        var accentChar = btn.dataset.char;
         if (!accentChar) return;
 
         insertAtCursor(answerInput, accentChar);
@@ -249,8 +251,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             renderChoices(q.choices);
         } else if (qType === 'fill_blank') {
+            var courseName = (window.COURSE_WORD_KEY || 'spanish');
+            var courseCapitalized = courseName.charAt(0).toUpperCase() + courseName.slice(1);
             promptEl.innerHTML = '<span class="quiz-prompt__label">' +
-                (config.lang === 'ko' ? '스페인어로 쓰세요:' : 'Write in Spanish:') +
+                (config.lang === 'ko' ? courseCapitalized + '(으)로 쓰세요:' : 'Write in ' + courseCapitalized + ':') +
                 '</span>' +
                 '<span class="quiz-prompt__word">' + escapeHtml(q.prompt) + '</span>';
             if (q.hint) {

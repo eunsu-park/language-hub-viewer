@@ -72,7 +72,7 @@ class VocabularyProgress(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     course = db.Column(db.String(100), nullable=False)
-    word_key = db.Column(db.String(200), nullable=False)  # "lesson:category:spanish" unique key
+    word_key = db.Column(db.String(200), nullable=False)  # "lesson:category:target_word" unique key
     ease_factor = db.Column(db.Float, default=2.5, nullable=False)
     interval = db.Column(db.Integer, default=0, nullable=False)
     repetitions = db.Column(db.Integer, default=0, nullable=False)

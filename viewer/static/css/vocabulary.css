@@ -328,6 +328,46 @@
     border-radius: var(--border-radius);
 }
 
+.vocab-loading {
+    text-align: center;
+    padding: var(--spacing-lg);
+    color: var(--text-secondary);
+}
+
+.vocab-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) 0;
+}
+
+.vocab-pagination__btn {
+    padding: var(--spacing-xs) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: var(--font-sm);
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.vocab-pagination__btn:hover:not(:disabled) {
+    background: var(--bg-secondary);
+    border-color: var(--accent);
+}
+
+.vocab-pagination__btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.vocab-pagination__info {
+    font-size: var(--font-sm);
+    color: var(--text-secondary);
+}
+
 /* ===========================================
    Responsive
    =========================================== */

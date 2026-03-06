@@ -22,7 +22,7 @@ from models import db, User, LessonRead, Bookmark, VocabularyProgress, QuizAttem
 from config import Config
 from progress import (get_batch_progress, get_batch_read_status, get_batch_bookmark_status,
                       get_vocabulary_stats, get_quiz_stats, get_cefr_progress, get_study_streak)
-from vocabulary import load_vocabulary, get_all_words, get_word_count
+from vocabulary import load_vocabulary, get_all_words, get_word_count, flatten_lesson_words
 from grammar import (load_conjugations, load_grammar_rules, load_tense_rules,
                      get_verb, get_verb_list, get_tense_list, get_rule, get_rule_list,
                      get_conjugation_drill_data)
@@ -440,8 +440,7 @@ def lesson(lang: str, course_name: str, filename: str):
 
     lesson_vocab = []
     if lesson_num:
-        all_words = get_all_words(course_name, lang)
-        lesson_vocab = [w for w in all_words if w.get("lesson_number") == lesson_num]
+        lesson_vocab = flatten_lesson_words(course_name, lesson_num, lang)
 
     return render_template(
         "lesson.html",
@@ -693,7 +692,6 @@ def vocabulary_index(lang: str, course_name: str):
 
     # Collect unique CEFR levels and lesson numbers for filter UI
     cefr_set = sorted({w["cefr"] for w in words if w.get("cefr")})
-    # Build lesson list with number and title for dropdown
     lesson_map = {}
     for w in words:
         num = w.get("lesson_number")
@@ -704,7 +702,6 @@ def vocabulary_index(lang: str, course_name: str):
         key=lambda x: int(x["number"]) if x["number"].isdigit() else 0,
     )
 
-    # Current filter state from query params
     filters = {
         "cefr": request.args.get("cefr", ""),
         "lesson": request.args.get("lesson", ""),
@@ -715,7 +712,6 @@ def vocabulary_index(lang: str, course_name: str):
         "vocabulary/index.html",
         course=course_name,
         course_display=lang_info.get("name", {}).get("native", course_name),
-        words=words,
         total_count=total_count,
         cefr_levels=cefr_set,
         lessons=lesson_list,
@@ -725,6 +721,51 @@ def vocabulary_index(lang: str, course_name: str):
         lang=lang,
         languages=get_available_languages(),
     )
+
+
+@app.route("/api/vocabulary")
+def api_vocabulary():
+    """Paginated vocabulary list with server-side filtering."""
+    course = request.args.get("course", "")
+    lang = request.args.get("lang", Config.DEFAULT_LANGUAGE)
+    cefr = request.args.get("cefr", "")
+    lesson = request.args.get("lesson", "")
+    source = request.args.get("source", "all")
+    q = request.args.get("q", "").strip()
+    page = max(1, int(request.args.get("page", 1)))
+    per_page = min(200, max(1, int(request.args.get("per_page", 50))))
+
+    course_dir = CONTENT_DIR / course
+    if not course_dir.exists():
+        return jsonify({"error": "course not found"}), 404
+
+    words = get_all_words(course, lang)
+
+    if cefr:
+        words = [w for w in words if w.get("cefr", "").upper() == cefr.upper()]
+    if lesson:
+        words = [w for w in words if str(w.get("lesson_number")) == str(lesson)]
+    if source == "lesson":
+        words = [w for w in words if w.get("lesson_number", 0) < 100]
+    elif source == "supplementary":
+        words = [w for w in words if w.get("lesson_number", 0) >= 100]
+    if q:
+        q_lower = q.lower()
+        words = [w for w in words
+                 if q_lower in w.get("target", "").lower()
+                 or q_lower in w.get("translation", "").lower()]
+
+    total = len(words)
+    start = (page - 1) * per_page
+    paginated = words[start:start + per_page]
+
+    return jsonify({
+        "words": paginated,
+        "total": total,
+        "page": page,
+        "per_page": per_page,
+        "total_pages": max(1, (total + per_page - 1) // per_page),
+    })
 
 
 @app.route("/<lang>/course/<course_name>/flashcard")

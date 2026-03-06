@@ -84,26 +84,31 @@ def get_all_words(course: str, lang: str | None = None) -> list[dict]:
 
     Each returned dict contains the word data (``target``, ``translation``,
     ``gender``, ``notes``) plus context keys: ``lesson``, ``lesson_number``,
-    ``cefr``, and ``category``.
+    ``cefr``, ``category``, ``type``, and ``topic``.
 
-    The target-language word is read from a dynamic YAML key derived from the
-    course name (e.g. ``spanish`` for Spanish, ``german`` for German).  A
-    ``"target"`` fallback key is also tried so that future YAML files can use
-    a generic field name.
-
-    When *lang* is provided, bilingual fields (translation, notes, category
-    label) are resolved to the matching language string.
+    Results are cached via mtime invalidation.
     """
     if lang is None:
         lang = Config.DEFAULT_LANGUAGE
+    vdir = _vocab_dir(course)
+    if not vdir.exists():
+        return []
+    mtime = vdir.stat().st_mtime
+    return list(_get_all_words_cached(course, lang, mtime))
 
-    word_key = course.lower()  # "Spanish" -> "spanish", "German" -> "german"
+
+@lru_cache(maxsize=64)
+def _get_all_words_cached(course: str, lang: str, _dir_mtime: float) -> tuple[dict, ...]:
+    """Cached inner word flattener; *_dir_mtime* busts the cache on changes."""
+    word_key = course.lower()
 
     words: list[dict] = []
-    for lesson in load_vocabulary(course):
+    for lesson in _load_vocabulary_cached(course, _dir_mtime):
         lesson_name = lesson.get("lesson", "")
         lesson_num = lesson.get("lesson_number", 0)
         cefr = lesson.get("cefr", lesson.get("jlpt", ""))
+        lesson_type = lesson.get("type", "lesson")
+        lesson_topic = lesson.get("topic", "")
         for cat in lesson.get("categories", []):
             cat_id = cat.get("id", "")
             cat_label = _resolve_i18n(cat.get("label", ""), lang)
@@ -123,7 +128,47 @@ def get_all_words(course: str, lang: str | None = None) -> list[dict]:
                     "gender": gender,
                     "notes": notes,
                     "word_key": f"{lesson_num}:{cat_id}:{target}",
+                    "type": lesson_type,
+                    "topic": lesson_topic,
                 })
+    return tuple(words)
+
+
+def flatten_lesson_words(course: str, lesson_number: int,
+                         lang: str | None = None) -> list[dict]:
+    """Flatten a single lesson's categories into a word list.
+
+    More efficient than ``get_all_words()`` when only one lesson is needed.
+    """
+    if lang is None:
+        lang = Config.DEFAULT_LANGUAGE
+    lesson = get_vocabulary_by_lesson(course, lesson_number)
+    if not lesson:
+        return []
+    word_key = course.lower()
+    lesson_name = lesson.get("lesson", "")
+    cefr = lesson.get("cefr", lesson.get("jlpt", ""))
+    words: list[dict] = []
+    for cat in lesson.get("categories", []):
+        cat_id = cat.get("id", "")
+        cat_label = _resolve_i18n(cat.get("label", ""), lang)
+        for word in cat.get("words", []):
+            target = word.get(word_key, word.get("target", ""))
+            translation = _resolve_i18n(word.get("translation", ""), lang)
+            notes = _resolve_i18n(word.get("notes", ""), lang)
+            gender = word.get("gender") or ""
+            words.append({
+                "lesson": lesson_name,
+                "lesson_number": lesson_number,
+                "cefr": cefr,
+                "category": cat_id,
+                "category_label": cat_label,
+                "target": target,
+                "translation": translation,
+                "gender": gender,
+                "notes": notes,
+                "word_key": f"{lesson_number}:{cat_id}:{target}",
+            })
     return words
 
 

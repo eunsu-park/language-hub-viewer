@@ -69,9 +69,9 @@
     <div class="vocab-count">
         <span class="word-count" id="word-count">
             {% if lang == 'ko' %}
-            {{ total_count }}개 중 <span id="showing-count">{{ words|length }}</span>개 표시
+            {{ total_count }}개 중 <span id="showing-count">0</span>개 표시
             {% else %}
-            Showing <span id="showing-count">{{ words|length }}</span> of {{ total_count }} words
+            Showing <span id="showing-count">0</span> of {{ total_count }} words
             {% endif %}
         </span>
     </div>
@@ -89,38 +89,30 @@
                 </tr>
             </thead>
             <tbody id="vocab-tbody">
-                {% for word in words %}
-                <tr class="vocab-row"
-                    data-word="{{ word.target }}"
-                    data-translation="{{ word.translation }}"
-                    data-gender="{{ word.gender or '' }}"
-                    data-cefr="{{ word.cefr or '' }}"
-                    data-lesson="{{ word.lesson or '' }}">
-                    <td class="vocab-row__word">
-                        {{ word.target }}
-                        <button class="tts-btn" type="button" data-text="{{ word.target }}" aria-label="{% if lang == 'ko' %}발음 듣기{% else %}Listen to pronunciation{% endif %}" title="{% if lang == 'ko' %}발음 듣기{% else %}Listen{% endif %}">{{ icon('speaker', 16) }}</button>
-                    </td>
-                    <td class="vocab-row__translation">{{ word.translation }}</td>
-                    <td class="vocab-row__gender">
-                        {% if word.gender %}
-                        <span class="gender-badge gender-badge--{{ word.gender }}">{{ word.gender }}</span>
-                        {% endif %}
-                    </td>
-                    <td class="vocab-row__cefr">
-                        {% if word.cefr %}
-                        <span class="cefr-badge cefr-badge--{{ word.cefr|lower }}">{{ word.cefr }}</span>
-                        {% endif %}
-                    </td>
-                    <td class="vocab-row__lesson">{{ word.lesson or '' }}</td>
-                </tr>
-                {% endfor %}
+                <!-- Populated by vocabulary.js via /api/vocabulary -->
             </tbody>
         </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="vocab-pagination" id="vocab-pagination" style="display: none;">
+        <button type="button" class="vocab-pagination__btn" id="page-prev" disabled>
+            {% if lang == 'ko' %}이전{% else %}Prev{% endif %}
+        </button>
+        <span class="vocab-pagination__info" id="page-info"></span>
+        <button type="button" class="vocab-pagination__btn" id="page-next" disabled>
+            {% if lang == 'ko' %}다음{% else %}Next{% endif %}
+        </button>
     </div>
 
     <!-- Empty State -->
     <div class="vocab-empty" id="vocab-empty" style="display: none;">
         <p>{% if lang == 'ko' %}일치하는 단어가 없습니다.{% else %}No words match your filters.{% endif %}</p>
+    </div>
+
+    <!-- Loading State -->
+    <div class="vocab-loading" id="vocab-loading">
+        <p>{% if lang == 'ko' %}로딩 중...{% else %}Loading...{% endif %}</p>
     </div>
 </div>
 
@@ -130,21 +122,14 @@
         course: '{{ course }}',
         lang: '{{ lang }}',
         totalCount: {{ total_count }},
-        flashcardUrl: '{{ url_for("flashcard_page", lang=lang, course_name=course) }}'
+        perPage: 100,
+        apiUrl: '/api/vocabulary',
+        flashcardUrl: '{{ url_for("flashcard_page", lang=lang, course_name=course) }}',
+        speakerSvg: '<svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>'
     };
 </script>
 {% endblock %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/vocabulary.js') }}"></script>
-<script>
-document.addEventListener('click', function(e) {
-    var btn = e.target.closest('.tts-btn');
-    if (btn && window.TTS) {
-        e.preventDefault();
-        e.stopPropagation();
-        TTS.speak(btn.dataset.text);
-    }
-});
-</script>
 {% endblock %}

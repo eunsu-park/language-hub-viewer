@@ -501,26 +501,50 @@ def dashboard(lang: str):
         "percentage": round(total_read / total_lessons * 100) if total_lessons > 0 else 0,
     }
 
-    # Extended stats (use first course since we primarily have Spanish)
-    course_name = courses[0]["name"] if courses else "Spanish"
-    vocab_stats = get_vocabulary_stats(user_id, course_name)
-    quiz_stats = get_quiz_stats(user_id, course_name)
-    total_words = get_word_count(course_name)
+    # Aggregate stats across all courses
+    total_words = 0
+    agg_vocab = {"total": 0, "learning": 0, "mastered": 0, "due_today": 0}
+    agg_quiz = {"attempts": 0, "avg_score": 0.0, "best_score": 0.0, "by_type": {}}
+    quiz_score_sum = 0.0
+    quiz_attempt_total = 0
+    for c in courses:
+        cn = c["name"]
+        total_words += get_word_count(cn)
+        vs = get_vocabulary_stats(user_id, cn)
+        for k in ("total", "learning", "mastered", "due_today"):
+            agg_vocab[k] += vs.get(k, 0)
+        qs = get_quiz_stats(user_id, cn)
+        attempts = qs.get("attempts", 0)
+        quiz_attempt_total += attempts
+        quiz_score_sum += qs.get("avg_score", 0.0) * attempts
+        if qs.get("best_score", 0.0) > agg_quiz["best_score"]:
+            agg_quiz["best_score"] = qs["best_score"]
+    agg_quiz["attempts"] = quiz_attempt_total
+    agg_quiz["avg_score"] = round(quiz_score_sum / quiz_attempt_total, 1) if quiz_attempt_total > 0 else 0.0
     streak = get_study_streak(user_id)
 
-    # Proficiency progress breakdown
-    metadata = courses[0] if courses else {}
-    stages = metadata.get("stages", [])
-    cefr_progress = get_cefr_progress(user_id, course_name, lang, stages)
-    prof_label = metadata.get("proficiency_label", "CEFR") if metadata else "CEFR"
+    # Per-course proficiency progress
+    per_course_progress = []
+    for c in courses:
+        cn = c["name"]
+        stages = c.get("stages", [])
+        prof_key = get_proficiency_key(cn)
+        cp = get_cefr_progress(user_id, cn, lang, stages)
+        per_course_progress.append({
+            "name": cn,
+            "display_name": c.get("display_name", cn),
+            "proficiency_label": c.get("proficiency_label", prof_key.upper()),
+            "stages": stages,
+            "progress": cp,
+            "prof_key": prof_key,
+        })
 
     return render_template(
         "dashboard.html",
         courses=courses, overall=overall,
-        vocab_stats=vocab_stats, quiz_stats=quiz_stats,
+        vocab_stats=agg_vocab, quiz_stats=agg_quiz,
         total_words=total_words, streak=streak,
-        cefr_progress=cefr_progress, stages=stages,
-        proficiency_label=prof_label,
+        per_course_progress=per_course_progress,
         lang=lang, languages=get_available_languages(),
     )
 

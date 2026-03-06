@@ -305,25 +305,26 @@
         </div>
     </section>
 
-    {# ===== Section 2: CEFR Stage Progress ===== #}
+    {# ===== Section 2: Per-Course Proficiency Progress ===== #}
+    {% for cp in per_course_progress %}
     <section class="home-section">
-        <h2>{% if lang == 'ko' %}{{ proficiency_label|default('CEFR') }} 단계별 진행률{% else %}{{ proficiency_label|default('CEFR') }} Stage Progress{% endif %}</h2>
-        {% if stages %}
+        <h2>{{ cp.display_name }} — {{ cp.proficiency_label }}
+            {% if lang == 'ko' %}단계별 진행률{% else %}Stage Progress{% endif %}</h2>
+        {% if cp.stages %}
         <div class="dashboard-cefr-list">
-            {% for stage in stages %}
-            {% set sp = cefr_progress.get(stage.id, {}) %}
-            {% set cefr_code = stage.cefr.split('-')[0] %}
-            {# CEFR color mapping #}
-            {% if cefr_code in ['A1', 'N5'] %}{% set badge_color = '#4CAF50' %}
-            {% elif cefr_code in ['A2', 'N4'] %}{% set badge_color = '#8BC34A' %}
-            {% elif cefr_code in ['B1', 'N3'] %}{% set badge_color = '#FFC107' %}
-            {% elif cefr_code in ['B2', 'N2'] %}{% set badge_color = '#FF9800' %}
-            {% elif cefr_code in ['C1', 'N1'] %}{% set badge_color = '#F44336' %}
+            {% for stage in cp.stages %}
+            {% set sp = cp.progress.get(stage.id, {}) %}
+            {% set level_code = stage.get(cp.prof_key, stage.get('cefr', '')).split('-')[0] %}
+            {% if level_code in ['A1', 'N5'] %}{% set badge_color = '#4CAF50' %}
+            {% elif level_code in ['A2', 'N4'] %}{% set badge_color = '#8BC34A' %}
+            {% elif level_code in ['B1', 'N3'] %}{% set badge_color = '#FFC107' %}
+            {% elif level_code in ['B2', 'N2'] %}{% set badge_color = '#FF9800' %}
+            {% elif level_code in ['C1', 'N1'] %}{% set badge_color = '#F44336' %}
             {% else %}{% set badge_color = '#6c757d' %}
             {% endif %}
             <div class="dashboard-cefr-card" data-stage="{{ stage.id }}">
                 <div class="dashboard-cefr-card__badge" style="background: {{ badge_color }};">
-                    {{ stage.cefr }}
+                    {{ stage.get(cp.prof_key, stage.get('cefr', '')) }}
                 </div>
                 <div class="dashboard-cefr-card__info">
                     <div class="dashboard-cefr-card__label">
@@ -345,13 +346,9 @@
             </div>
             {% endfor %}
         </div>
-        {% else %}
-        <div class="dashboard-empty">
-            <div class="dashboard-empty__icon">&#128203;</div>
-            <p>{% if lang == 'ko' %}코스 데이터를 불러올 수 없습니다.{% else %}No course data available.{% endif %}</p>
-        </div>
         {% endif %}
     </section>
+    {% endfor %}
 
     {# ===== Section 3: Vocabulary Stats ===== #}
     <section class="home-section">

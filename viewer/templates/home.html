@@ -19,7 +19,7 @@
                     <span class="lesson-count">{{ course.total_lessons }} {% if lang == 'ko' %}레슨{% else %}lessons{% endif %}</span>
                 </div>
                 <div class="topic-card-meta">
-                    <span class="cefr-badge">CEFR {{ course.cefr_range }}</span>
+                    <span class="cefr-badge">{{ course.proficiency_label }} {{ course.cefr_range }}</span>
                     {% if course.label.get(lang) %}
                     <span class="course-label">{{ course.label[lang] }}</span>
                     {% endif %}

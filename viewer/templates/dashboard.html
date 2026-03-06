@@ -307,18 +307,18 @@
 
     {# ===== Section 2: CEFR Stage Progress ===== #}
     <section class="home-section">
-        <h2>{% if lang == 'ko' %}CEFR 단계별 진행률{% else %}CEFR Stage Progress{% endif %}</h2>
+        <h2>{% if lang == 'ko' %}{{ proficiency_label|default('CEFR') }} 단계별 진행률{% else %}{{ proficiency_label|default('CEFR') }} Stage Progress{% endif %}</h2>
         {% if stages %}
         <div class="dashboard-cefr-list">
             {% for stage in stages %}
             {% set sp = cefr_progress.get(stage.id, {}) %}
             {% set cefr_code = stage.cefr.split('-')[0] %}
             {# CEFR color mapping #}
-            {% if cefr_code == 'A1' %}{% set badge_color = '#4CAF50' %}
-            {% elif cefr_code == 'A2' %}{% set badge_color = '#8BC34A' %}
-            {% elif cefr_code == 'B1' %}{% set badge_color = '#FFC107' %}
-            {% elif cefr_code == 'B2' %}{% set badge_color = '#FF9800' %}
-            {% elif cefr_code == 'C1' %}{% set badge_color = '#F44336' %}
+            {% if cefr_code in ['A1', 'N5'] %}{% set badge_color = '#4CAF50' %}
+            {% elif cefr_code in ['A2', 'N4'] %}{% set badge_color = '#8BC34A' %}
+            {% elif cefr_code in ['B1', 'N3'] %}{% set badge_color = '#FFC107' %}
+            {% elif cefr_code in ['B2', 'N2'] %}{% set badge_color = '#FF9800' %}
+            {% elif cefr_code in ['C1', 'N1'] %}{% set badge_color = '#F44336' %}
             {% else %}{% set badge_color = '#6c757d' %}
             {% endif %}
             <div class="dashboard-cefr-card" data-stage="{{ stage.id }}">

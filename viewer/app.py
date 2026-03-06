@@ -147,23 +147,22 @@ def load_course_metadata(course: str) -> dict:
     return data
 
 
-_cefr_cache = None
+_proficiency_cache: dict[str, dict] = {}
 
 
-def load_cefr_levels() -> dict:
-    """Load CEFR level definitions from _shared/cefr_levels.yaml."""
-    global _cefr_cache
-    if _cefr_cache is not None:
-        return _cefr_cache
+def load_proficiency_levels(framework: str = "cefr") -> dict:
+    """Load proficiency level definitions from _shared/<framework>_levels.yaml."""
+    if framework in _proficiency_cache:
+        return _proficiency_cache[framework]
 
-    yaml_path = CONTENT_DIR / "_shared" / "cefr_levels.yaml"
+    yaml_path = CONTENT_DIR / "_shared" / f"{framework}_levels.yaml"
     if not yaml_path.exists():
-        _cefr_cache = {"levels": []}
-        return _cefr_cache
+        _proficiency_cache[framework] = {"levels": []}
+        return _proficiency_cache[framework]
 
     with open(yaml_path, encoding="utf-8") as f:
-        _cefr_cache = yaml.safe_load(f) or {"levels": []}
-    return _cefr_cache
+        _proficiency_cache[framework] = yaml.safe_load(f) or {"levels": []}
+    return _proficiency_cache[framework]
 
 
 def get_courses() -> list[dict]:
@@ -180,12 +179,16 @@ def get_courses() -> list[dict]:
         lang_info = meta.get("language", {})
         stages = meta.get("stages", [])
         total_lessons = sum(len(s.get("lessons", [])) for s in stages)
+        prof_key = lang_info.get("proficiency_framework", "cefr")
+        first = stages[0].get(prof_key, "") if stages else ""
+        last = stages[-1].get(prof_key, "") if stages else ""
         courses.append({
             "name": course_dir.name,
             "display_name": lang_info.get("name", {}).get("native", course_dir.name),
             "code": lang_info.get("code", ""),
             "label": lang_info.get("name", {}),
-            "cefr_range": f"{stages[0]['cefr']}-{stages[-1]['cefr']}" if stages else "",
+            "cefr_range": f"{first}-{last}" if stages else "",
+            "proficiency_label": prof_key.upper(),
             "total_lessons": total_lessons,
             "stages": stages,
         })
@@ -206,6 +209,12 @@ def get_course_lang(course: str) -> dict:
         "accent_chars": lang_info.get("accent_chars", ["á", "é", "í", "ó", "ú", "ñ", "ü"]),
         "name": lang_info.get("name", {}),
     }
+
+
+def get_proficiency_key(course: str) -> str:
+    """Return the proficiency framework key for a course ('cefr' or 'jlpt')."""
+    meta = load_course_metadata(course)
+    return meta.get("language", {}).get("proficiency_framework", "cefr")
 
 
 def get_content_dir(course: str, lang: str) -> Path:
@@ -248,9 +257,10 @@ def get_available_languages() -> list[dict]:
 
 
 def get_stage_lessons(course: str, lang: str) -> list[dict]:
-    """Get lessons organized by CEFR stages."""
+    """Get lessons organized by proficiency stages."""
     meta = load_course_metadata(course)
     stages = meta.get("stages", [])
+    prof_key = get_proficiency_key(course)
     all_lessons = get_lessons(course, lang)
     lesson_map = {l["filename"]: l for l in all_lessons}
 
@@ -265,7 +275,7 @@ def get_stage_lessons(course: str, lang: str) -> list[dict]:
                     break
         result.append({
             "id": stage["id"],
-            "cefr": stage["cefr"],
+            "cefr": stage.get(prof_key, ""),
             "label": stage.get("label", {}),
             "description": stage.get("description", {}),
             "lessons": stage_lessons,
@@ -317,9 +327,10 @@ def course_home(lang: str, course_name: str):
     lang_info = meta.get("language", {})
     staged_lessons = get_stage_lessons(course_name, lang)
     user_id = _get_user_id()
-    cefr_data = load_cefr_levels()
-    cefr_levels_raw = cefr_data.get("levels", {})
-    cefr_levels = {k.lower(): v for k, v in cefr_levels_raw.items()} if isinstance(cefr_levels_raw, dict) else {}
+    prof_key = get_proficiency_key(course_name)
+    prof_data = load_proficiency_levels(prof_key)
+    prof_levels_raw = prof_data.get("levels", {})
+    cefr_levels = {k.lower(): v for k, v in prof_levels_raw.items()} if isinstance(prof_levels_raw, dict) else {}
 
     # Get read/bookmark status for all lessons
     all_filenames = []
@@ -497,10 +508,11 @@ def dashboard(lang: str):
     total_words = get_word_count(course_name)
     streak = get_study_streak(user_id)
 
-    # CEFR progress breakdown
+    # Proficiency progress breakdown
     metadata = courses[0] if courses else {}
     stages = metadata.get("stages", [])
     cefr_progress = get_cefr_progress(user_id, course_name, lang, stages)
+    prof_label = metadata.get("proficiency_label", "CEFR") if metadata else "CEFR"
 
     return render_template(
         "dashboard.html",
@@ -508,6 +520,7 @@ def dashboard(lang: str):
         vocab_stats=vocab_stats, quiz_stats=quiz_stats,
         total_words=total_words, streak=streak,
         cefr_progress=cefr_progress, stages=stages,
+        proficiency_label=prof_label,
         lang=lang, languages=get_available_languages(),
     )
 
@@ -684,6 +697,7 @@ def vocabulary_index(lang: str, course_name: str):
         lessons=lesson_list,
         filters=filters,
         course_lang=get_course_lang(course_name),
+        proficiency_label=get_proficiency_key(course_name).upper(),
         lang=lang,
         languages=get_available_languages(),
     )
@@ -1008,6 +1022,7 @@ def quiz_page(lang: str, course_name: str):
         cefr_levels=cefr_set,
         lessons=lesson_list,
         course_lang=get_course_lang(course_name),
+        proficiency_label=get_proficiency_key(course_name).upper(),
         lang=lang,
         languages=get_available_languages(),
     )

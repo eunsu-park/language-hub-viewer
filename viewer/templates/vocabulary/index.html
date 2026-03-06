@@ -24,7 +24,7 @@
     <div class="vocab-filters">
         <div class="vocab-filters__row">
             <div class="vocab-filters__cefr">
-                <span class="vocab-filters__label">CEFR:</span>
+                <span class="vocab-filters__label">{{ proficiency_label|default('CEFR') }}:</span>
                 {% for level in cefr_levels %}
                 <button class="cefr-filter-btn {% if filters.cefr == level %}active{% endif %}"
                         data-level="{{ level }}"
@@ -84,7 +84,7 @@
                     <th class="vocab-table__col-word">{{ course_display }}</th>
                     <th class="vocab-table__col-translation">{% if lang == 'ko' %}뜻{% else %}Translation{% endif %}</th>
                     <th class="vocab-table__col-gender">{% if lang == 'ko' %}성{% else %}Gender{% endif %}</th>
-                    <th class="vocab-table__col-cefr">CEFR</th>
+                    <th class="vocab-table__col-cefr">{{ proficiency_label|default('CEFR') }}</th>
                     <th class="vocab-table__col-lesson">{% if lang == 'ko' %}레슨{% else %}Lesson{% endif %}</th>
                 </tr>
             </thead>

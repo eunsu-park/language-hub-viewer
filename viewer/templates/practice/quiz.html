@@ -38,7 +38,7 @@
             </div>
             <div class="drill-filters__field">
                 <label for="cefr-filter" class="drill-filters__label">
-                    {% if lang == 'ko' %}CEFR 레벨{% else %}CEFR Level{% endif %}
+                    {% if lang == 'ko' %}{{ proficiency_label|default('CEFR') }} 레벨{% else %}{{ proficiency_label|default('CEFR') }} Level{% endif %}
                 </label>
                 <select id="cefr-filter" class="drill-select">
                     <option value="all">{% if lang == 'ko' %}전체{% else %}All Levels{% endif %}</option>

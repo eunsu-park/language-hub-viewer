@@ -103,7 +103,7 @@ def get_all_words(course: str, lang: str | None = None) -> list[dict]:
     for lesson in load_vocabulary(course):
         lesson_name = lesson.get("lesson", "")
         lesson_num = lesson.get("lesson_number", 0)
-        cefr = lesson.get("cefr", "")
+        cefr = lesson.get("cefr", lesson.get("jlpt", ""))
         for cat in lesson.get("categories", []):
             cat_id = cat.get("id", "")
             cat_label = _resolve_i18n(cat.get("label", ""), lang)

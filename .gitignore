@@ -1,5 +1,42 @@
+# macOS
+.DS_Store
+._*
+
+# Linux
+*~
+.Trash-*
+
+# Windows
+Thumbs.db
+[Dd]esktop.ini
+
+# Python
 __pycache__/
-*.pyc
-*.db
+*.py[cod]
+*.egg-info/
+*.egg
+
+# Environments
 .env
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing
 .pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+
+# Database
+*.db
+
+# Flask
+instance/

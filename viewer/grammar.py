@@ -153,7 +153,7 @@ def get_rule_list(course: str) -> list[dict]:
             "id": info.get("id", key),
             "label": info.get("label", {}),
             "category": info.get("category", ""),
-            "cefr": info.get("cefr", info.get("jlpt", "")),
+            "cefr": info.get("cefr", info.get("jlpt", info.get("topik", ""))),
             "description": info.get("description", {}),
         })
     return result

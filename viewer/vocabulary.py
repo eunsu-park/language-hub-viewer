@@ -106,7 +106,7 @@ def _get_all_words_cached(course: str, lang: str, _dir_mtime: float) -> tuple[di
     for lesson in _load_vocabulary_cached(course, _dir_mtime):
         lesson_name = lesson.get("lesson", "")
         lesson_num = lesson.get("lesson_number", 0)
-        cefr = lesson.get("cefr", lesson.get("jlpt", ""))
+        cefr = lesson.get("cefr", lesson.get("jlpt", lesson.get("topik", "")))
         lesson_type = lesson.get("type", "lesson")
         lesson_topic = lesson.get("topic", "")
         for cat in lesson.get("categories", []):
@@ -147,7 +147,7 @@ def flatten_lesson_words(course: str, lesson_number: int,
         return []
     word_key = course.lower()
     lesson_name = lesson.get("lesson", "")
-    cefr = lesson.get("cefr", lesson.get("jlpt", ""))
+    cefr = lesson.get("cefr", lesson.get("jlpt", lesson.get("topik", "")))
     words: list[dict] = []
     for cat in lesson.get("categories", []):
         cat_id = cat.get("id", "")

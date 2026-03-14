@@ -154,7 +154,7 @@ def get_cefr_progress(user_id: int | None, course: str, lang: str,
     result = {}
     for stage in stages:
         stage_id = stage.get("id", "")
-        cefr = stage.get("cefr", stage.get("jlpt", stage.get("topik", "")))
+        cefr = stage.get("cefr", stage.get("jlpt", stage.get("topik", stage.get("hanja_level", ""))))
         lesson_nums = stage.get("lessons", [])
         total = len(lesson_nums)
         # Count how many lesson filenames start with these numbers

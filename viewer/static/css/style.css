@@ -2,6 +2,23 @@
    Study Viewer - Main Stylesheet
    =========================================== */
 
+/* D2Coding - Korean monospace font (CJK chars = 2x Latin width) */
+@font-face {
+    font-family: 'D2Coding';
+    src: url('../fonts/D2Coding.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'D2Coding';
+    src: url('../fonts/D2CodingBold.woff2') format('woff2');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
 /* CSS Variables */
 :root {
     /* Colors - Light Theme */
@@ -34,7 +51,7 @@
 
     /* Typography */
     --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --font-mono: "SF Mono", "Fira Code", "Fira Mono", Menlo, Monaco, Consolas, monospace;
+    --font-mono: "D2Coding", "SF Mono", "Fira Code", "Fira Mono", Menlo, Monaco, Consolas, monospace;
     --font-size-sm: 0.875rem;
     --font-size-base: 1rem;
     --font-size-lg: 1.125rem;

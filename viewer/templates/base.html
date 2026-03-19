@@ -12,6 +12,7 @@
         })();
     </script>
     <title>{% block title %}Language Viewer{% endblock %}</title>
+    <link rel="preload" href="{{ url_for('static', filename='fonts/D2Coding.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/highlight.css') }}">
     <!-- KaTeX for LaTeX math rendering -->

@@ -83,6 +83,110 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Reading position memory (localStorage)
+    (function initReadingPosition() {
+        var key = 'reading-pos:' + topic + '/' + filename;
+        var saved = localStorage.getItem(key);
+
+        if (saved) {
+            var pos = JSON.parse(saved);
+            if (pos.scrollY > 100) {
+                requestAnimationFrame(function() {
+                    window.scrollTo(0, pos.scrollY);
+                });
+            }
+        }
+
+        var saveTimer = null;
+        window.addEventListener('scroll', function() {
+            if (saveTimer) clearTimeout(saveTimer);
+            saveTimer = setTimeout(function() {
+                localStorage.setItem(key, JSON.stringify({
+                    scrollY: window.scrollY,
+                    ts: Date.now()
+                }));
+            }, 300);
+        });
+
+        try {
+            var posKeys = [];
+            for (var i = 0; i < localStorage.length; i++) {
+                var k = localStorage.key(i);
+                if (k && k.startsWith('reading-pos:')) posKeys.push(k);
+            }
+            if (posKeys.length > 100) {
+                var entries = posKeys.map(function(k) {
+                    var v = JSON.parse(localStorage.getItem(k) || '{}');
+                    return { key: k, ts: v.ts || 0 };
+                }).sort(function(a, b) { return a.ts - b.ts; });
+                entries.slice(0, entries.length - 100).forEach(function(e) {
+                    localStorage.removeItem(e.key);
+                });
+            }
+        } catch(_) {}
+    })();
+
+    // Floating TOC with scroll-spy
+    (function initFloatingToc() {
+        var tocNav = document.getElementById('floating-toc');
+        var content = document.querySelector('.lesson-content');
+        if (!tocNav || !content) return;
+
+        var headings = content.querySelectorAll('h2, h3');
+        if (headings.length < 2) return;
+
+        headings.forEach(function(h, i) {
+            if (!h.id) h.id = 'heading-' + i;
+        });
+
+        var html = '<div class="ftoc-title">On this page</div><ul>';
+        headings.forEach(function(h) {
+            var level = h.tagName === 'H3' ? ' class="ftoc-h3"' : '';
+            html += '<li' + level + '><a href="#' + h.id + '">' + h.textContent + '</a></li>';
+        });
+        html += '</ul>';
+        tocNav.innerHTML = html;
+
+        var links = tocNav.querySelectorAll('a');
+        var activeIndex = 0;
+
+        function setActive(index) {
+            if (index === activeIndex && links[index].classList.contains('active')) return;
+            links.forEach(function(a) { a.classList.remove('active'); });
+            if (links[index]) {
+                links[index].classList.add('active');
+                activeIndex = index;
+                links[index].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+        }
+
+        var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    var idx = Array.prototype.indexOf.call(headings, entry.target);
+                    if (idx !== -1) setActive(idx);
+                }
+            });
+        }, {
+            rootMargin: '-80px 0px -70% 0px',
+            threshold: 0
+        });
+
+        headings.forEach(function(h) { observer.observe(h); });
+
+        tocNav.addEventListener('click', function(e) {
+            var link = e.target.closest('a');
+            if (!link) return;
+            e.preventDefault();
+            var target = document.getElementById(link.getAttribute('href').slice(1));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+
+        setActive(0);
+    })();
+
     document.addEventListener('keydown', function(e) {
         const tag = document.activeElement.tagName;
         if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;

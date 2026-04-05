@@ -1190,6 +1190,10 @@ def init_db():
 @app.cli.command("build-index")
 def build_index():
     db_path = Path(app.config["SQLALCHEMY_DATABASE_URI"].replace("sqlite:///", ""))
+    # Ensure FTS table exists (auto-create if missing)
+    with app.app_context():
+        db.create_all()
+    create_fts_table(db_path)
     # Index lessons from each course in each instruction language
     for course_dir in sorted(CONTENT_DIR.iterdir()):
         if not course_dir.is_dir() or course_dir.name.startswith("_"):

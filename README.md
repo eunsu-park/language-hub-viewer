@@ -1,8 +1,8 @@
 # Language Viewer (Web Viewer / 웹 뷰어)
 
-A Flask-based multi-language learning viewer with proficiency-based progress tracking (CEFR/JLPT), vocabulary flashcards (SM-2 SRS), grammar reference, conjugation drills, quizzes, TTS pronunciation, and a proficiency dashboard. Supports Spanish, German, and Japanese courses with automatic course discovery.
+language-hub의 콘텐츠를 렌더링하는 Flask 기반 웹 뷰어. SRS 플래시카드, 활용 드릴, 퀴즈, TTS를 제공한다.
 
-Flask 기반 다국어 학습 뷰어. 숙련도 기반 진도 추적 (CEFR/JLPT), 어휘 플래시카드 (SM-2 SRS), 문법 참조, 활용 연습, 퀴즈, TTS 발음 재생, 숙련도 대시보드를 지원합니다. 스페인어, 독일어, 일본어 코스를 자동 탐색으로 지원합니다.
+A Flask-based web viewer that renders [language-hub](https://github.com/eunsu-park/language-hub) content with SRS flashcards, conjugation drills, quizzes, and TTS.
 
 ## Features / 기능
 

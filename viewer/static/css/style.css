@@ -1285,6 +1285,90 @@ a:hover {
     border: 1px solid var(--border-color);
 }
 
+/* ===========================================
+   Floating TOC (scroll-spy sidebar)
+   =========================================== */
+
+.floating-toc {
+    display: none;
+}
+
+@media (min-width: 1400px) {
+    .floating-toc {
+        display: block;
+        position: fixed;
+        top: calc(var(--header-height) + var(--spacing-xl));
+        right: var(--spacing-xl);
+        width: 220px;
+        max-height: calc(100vh - var(--header-height) - var(--spacing-xl) * 2);
+        overflow-y: auto;
+        padding: var(--spacing-md);
+        border-left: 2px solid var(--border-color);
+        z-index: 50;
+    }
+
+    .floating-toc:empty {
+        display: none;
+    }
+
+    .floating-toc .ftoc-title {
+        font-size: var(--font-size-xs);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .floating-toc ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .floating-toc li {
+        margin-bottom: 2px;
+    }
+
+    .floating-toc li.ftoc-h3 {
+        padding-left: var(--spacing-md);
+    }
+
+    .floating-toc a {
+        display: block;
+        padding: 3px var(--spacing-sm);
+        font-size: var(--font-size-xs);
+        color: var(--text-secondary);
+        text-decoration: none;
+        border-radius: var(--border-radius-sm);
+        line-height: 1.4;
+        transition: color var(--transition-fast), background var(--transition-fast);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .floating-toc a:hover {
+        color: var(--text-primary);
+        background: var(--bg-secondary);
+    }
+
+    .floating-toc a.active {
+        color: var(--accent-color);
+        background: var(--bg-secondary);
+        font-weight: 500;
+    }
+
+    /* Thin custom scrollbar */
+    .floating-toc::-webkit-scrollbar {
+        width: 3px;
+    }
+    .floating-toc::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 3px;
+    }
+}
+
 /* Lesson Navigation (prev/next links) */
 .nav-prev, .nav-next {
     display: block;
